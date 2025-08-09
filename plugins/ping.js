@@ -37,7 +37,7 @@ async (conn, mek, m, { from, sender, reply }) => {
         const ping = end - start;
 
         await conn.sendMessage(from, {
-            text: `*${reactionEmoji} 𝐏๏፝֟ƞ̽g ${ping} ms 📶*`,
+            text: `*${reactionEmoji} 𝐏๏፝֟ƞ̽g ${ping} 𝐌𝐒*`,
             contextInfo: {
                 mentionedJid: [sender],
                 forwardingScore: 999,
