@@ -39,7 +39,7 @@ cmd({
 
         if (!target) return reply("*ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ɴᴜᴍʙᴇʀ ᴏʀ ᴛᴀɢ/ʀᴇᴘʟʏ ᴀ ᴜsᴇʀ.*");
 
-        let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
+        let own = JSON.parse(fs.readFileSync("./lib/sudo.json", "utf-8"));
 
         if (own.includes(target)) {
             return reply("ᴛʜɪs ᴜsᴇʀ ɪs ᴀʟʀᴇᴀᴅʏ ᴀ ᴛᴇᴍᴘᴏʀᴀʀʏ ᴏᴡɴᴇʀ.");
@@ -47,12 +47,12 @@ cmd({
 
         own.push(target);
         const uniqueOwners = [...new Set(own)];
-        fs.writeFileSync("./lib/owner.json", JSON.stringify(uniqueOwners, null, 2));
+        fs.writeFileSync("./lib/sudo.json", JSON.stringify(uniqueOwners, null, 2));
 
         const dec = `✅ @${target.split("@")[0]} ʜᴀs ʙᴇᴇɴ ᴀᴅᴅᴇᴅ ᴀs ᴀ ᴛᴇᴍᴘᴏʀᴀʀʏ ᴏᴡɴᴇʀ`;
 
         await conn.sendMessage(from, {
-            image: { url: "https://files.catbox.moe/roubzi.jpg" },
+            image: { url: config.MENU_IMAGE_URL },
             caption: dec,
             mentions: [target] // 🔥 Ceci active le tag du user
         }, { quoted: mek });
@@ -82,18 +82,18 @@ cmd({
         // اگر هیچ هدفی وارد نشده بود، پیام خطا بده
         if (!target) return reply("ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ɴᴜᴍʙᴇʀ ᴏʀ ᴛᴀɢ/ʀᴇᴘʟʏ ᴀ ᴜsᴇʀ.");
 
-        let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
+        let own = JSON.parse(fs.readFileSync("./lib/sudo.json", "utf-8"));
 
         if (!own.includes(target)) {
             return reply("❌ ᴜsᴇʀ ɴᴏᴛ ғᴏᴜɴᴅ ɪɴ ᴏᴡɴᴇʀ ʟɪsᴛ.");
         }
 
         const updated = own.filter(x => x !== target);
-        fs.writeFileSync("./lib/owner.json", JSON.stringify(updated, null, 2));
+        fs.writeFileSync("./lib/sudo.json", JSON.stringify(updated, null, 2));
 
         const dec = "✅ sᴜᴄᴄᴇssғᴜʟʟʏ ʀᴇᴍᴏᴠᴇᴅ User ᴀs ᴛᴇᴍᴘᴏʀᴀʀʏ ᴏᴡɴᴇʀ";
         await conn.sendMessage(from, {  // استفاده از await در اینجا درست است
-            image: { url: "https://files.catbox.moe/roubzi.jpg" },
+            image: { url: config.MENU_IMAGE_URL },
             caption: dec
         }, { quoted: mek });
     } catch (err) {
@@ -118,7 +118,7 @@ cmd({
         }
 
         // Read the owner list from the file and remove duplicates
-        let own = JSON.parse(fs.readFileSync("./lib/owner.json", "utf-8"));
+        let own = JSON.parse(fs.readFileSync("./lib/sudo.json", "utf-8"));
         own = [...new Set(own)]; // Remove duplicates
 
         // If no temporary owners exist
@@ -134,7 +134,7 @@ cmd({
 
         // Send the message with an image and formatted caption
         await conn.sendMessage(from, {
-            image: { url: "https://files.catbox.moe/roubzi.jpg" },
+            image: { url: config.MENU_IMAGE_URL },
             caption: listMessage
         }, { quoted: mek });
     } catch (err) {
