@@ -65,7 +65,6 @@ cmd({
                     audio: { url: data.result.downloadUrl },
                     mimetype: "audio/mpeg"
                 }, { quoted: msg });
-                conn.ev.off("messages.upsert", handler); // Supprime l’écouteur après usage
             } else if (text === "document") {
                 await conn.sendMessage(from, {
                     document: { url: data.result.downloadUrl },
@@ -73,21 +72,24 @@ cmd({
                     fileName: `${data.result.title}.mp3`,
                     caption: "> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*"
                 }, { quoted: msg });
-                conn.ev.off("messages.upsert", handler); // Supprime l’écouteur après usage
             } else {
                 await conn.sendMessage(from, {
-                    text: "❎ ɪɴᴠᴀʟɪᴅ ᴄʜᴏɪᴄᴇ. ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴡɪᴛʜ *ᴀᴜᴅɪᴏ* ᴏʀ *ᴅᴏᴄᴜᴍᴇɴᴛ* ᴏɴʟʏ.",
+                    text: "❎ ɪɴᴠᴀʟɪᴅ ᴄʜᴏɪᴄᴇ. ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴡɪᴛʜ *ᴀᴜᴅɪᴏ* or *ᴅᴏᴄᴜᴍᴇɴᴛ* ᴏɴʟʏ.",
                 }, { quoted: msg });
             }
         };
 
-        // On ajoute l'écouteur
+        // On ajoute l'écouteur (il reste actif tant que le bot tourne)
         conn.ev.on("messages.upsert", handler);
 
-        // Optionnel : après 5 min on supprime l'écouteur (évite fuite mémoire)
-        setTimeout(() => {
-            conn.ev.off("messages.upsert", handler);
-        }, 5 * 60 * 1000);
+        // IMPORTANT : si tu veux limiter la durée, tu peux gérer un clearTimeout ici
+        // Mais pour illimité, ne rien mettre (attention à la mémoire)
+
+    } catch (err) {
+        console.error(err);
+        reply("❌ An error occurred. Please try again later.");
+    }
+});        }, 5 * 60 * 1000);
 
     } catch (err) {
         console.error(err);
