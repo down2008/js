@@ -70,10 +70,20 @@ async (conn, mek, m, { from, reply, isCreator, isOwner }) => {
 _ʀᴇᴘʟʏ ᴡɪᴛʜ: 1.1, 2.2, ᴇᴛᴄ ᴛᴏ ᴛᴏɢɢʟᴇ ᴏɴ/ᴏғғ_
 `;
 
-    const sent = await conn.sendMessage(from, {
-    caption: menu,
-    image: { url: "https://files.catbox.moe/roubzi.jpg" }  // عکس تستی
-}, { quoted: mek });
+    const sent = conn.sendMessage(from, {
+         image: { url: config.MENU_IMAGE_URL }
+            caption: menu,
+            contextInfo: {
+                mentionedJid: [m.sender],
+                forwardingScore: 999,
+                isForwarded: true,
+                forwardedNewsletterMessageInfo: {
+                    newsletterJid: '120363401051937059@newsletter',
+                    newsletterName: '𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃',
+                    serverMessageId: 143
+                }
+            }
+        }, { quoted: mek });
 
     const messageID = sent.key.id;
 
