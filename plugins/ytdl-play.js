@@ -12,7 +12,7 @@ cmd({
   filename: __filename
 }, async (conn, mek, m, { from, q, reply }) => {
   try {
-    if (!q) return reply("*🎵 Please provide a YouTube URL or song name.*");
+    if (!q) return reply("*🎵 ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ʏᴏᴜᴛᴜʙᴇ ᴜʀʟ ᴏʀ sᴏɴɢ ɴᴀᴍᴇ.*");
 
     const searchResult = await ytsearch(q);
     if (!searchResult.videos.length) return reply("❌ No results found!");
@@ -36,8 +36,8 @@ cmd({
 │ ⿻ *Link:* ${video.url}
 ╰─────────────⭑─
 📌 *ʀᴇᴘʟʏ ᴡɪᴛʜ ᴛʜᴇ ɴᴜᴍʙᴇʀ ᴛᴏ ᴄʜᴏᴏsᴇ:* 
-1. Audio
-2. Document
+1. ᴀᴜᴅɪᴏ
+2. ᴅᴏᴄᴜᴍᴇɴᴛ
 `;
 
     // Envoie du menu en citant la commande
@@ -75,11 +75,11 @@ cmd({
           document: { url: data.result.downloadUrl },
           mimetype: "audio/mpeg",
           fileName: `${data.result.title}.mp3`,
-          caption: "> *© Powered by Dyby Tech*"
+          caption: "> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*"
         }, { quoted: receivedMsg });
       } else {
         await conn.sendMessage(from, {
-          text: "❎ Invalid choice. Please reply with *1* or *2* only.",
+          text: "❎ ɪɴᴠᴀʟɪᴅ ᴄʜᴏɪᴄᴇ. ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴡɪᴛʜ *1* ᴏʀ *2* ᴏɴʟʏ.",
         }, { quoted: receivedMsg });
       }
     };
