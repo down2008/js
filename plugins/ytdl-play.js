@@ -2,18 +2,6 @@ const { cmd } = require('../command');
 const fetch = require('node-fetch');
 const ytsearch = require('yt-search');
 
-const pendingChoices = new Map(); // userId -> { downloadUrl, title, from }
-
-function toSmallCaps(text) {
-  const map = {
-    a: 'ᴀ', b: 'ʙ', c: 'ᴄ', d: 'ᴅ', e: 'ᴇ', f: 'ꜰ', g: 'ɢ', h: 'ʜ',
-    i: 'ɪ', j: 'ᴊ', k: 'ᴋ', l: 'ʟ', m: 'ᴍ', n: 'ɴ', o: 'ᴏ', p: 'ᴘ',
-    q: 'ǫ', r: 'ʀ', s: 's', t: 'ᴛ', u: 'ᴜ', v: 'ᴠ', w: 'ᴡ', x: 'x',
-    y: 'ʏ', z: 'ᴢ'
-  };
-  return text.toLowerCase().split('').map(c => map[c] || c).join('');
-}
-
 cmd({
     pattern: "play",
     alias: ["mp3"],
@@ -39,79 +27,70 @@ cmd({
         if (data.status !== 200 || !data.success || !data.result.downloadUrl)
             return reply("⚠️ Failed to fetch the audio. Please try again later.");
 
-        // Utilisation de la fonction pour styliser les mots-clés
-        const styledTitle = toSmallCaps("Title:");
-        const styledDuration = toSmallCaps("Duration:");
-        const styledViews = toSmallCaps("Views:");
-        const styledAuthor = toSmallCaps("Author:");
-        const styledLink = toSmallCaps("Link:");
-        const styledReply = toSmallCaps("Reply with");
-        const styledAudio = "`audio`";
-        const styledDocument = "`document`";
-        const styledEnjoy = toSmallCaps("Enjoy your music 🎶");
-
         const songInfo = `
 ╭── 『 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 』
-│ ⿻ *${styledTitle}* ${video.title}
-│ ⿻ *${styledDuration}* ${video.timestamp}
-│ ⿻ *${styledViews}* ${video.views}
-│ ⿻ *${styledAuthor}* ${video.author.name}
-│ ⿻ *${styledLink}* ${video.url}
+│ ⿻ *Title:* ${video.title}
+│ ⿻ *Duration:* ${video.timestamp}
+│ ⿻ *Views:* ${video.views}
+│ ⿻ *Author:* ${video.author.name}
+│ ⿻ *Link:* ${video.url}
 ╰─────────────⭑─
-> *${styledReply}*  ${styledAudio} *ᴏʀ* ${styledDocument} *ᴛᴏ ᴄʜᴏᴏsᴇ ᴛʜᴇ ғᴏʀᴍᴀᴛ.*
-> *${styledEnjoy}*
+> *ʀᴇᴘʟʏ ᴛᴏ ᴛʜɪs ᴍᴇssᴀɢᴇ ᴡɪᴛʜ* \`audio\` *ᴏʀ* \`document\` *ᴛᴏ ᴄʜᴏᴏsᴇ ᴛʜᴇ ғᴏʀᴍᴀᴛ.*
         `;
 
-        await conn.sendMessage(from, {
+        // Envoie du message avec demande de reply
+        const sentMsg = await conn.sendMessage(from, {
             image: { url: data.result.image || '' },
             caption: songInfo
         }, { quoted: m });
 
-        pendingChoices.set(m.sender, {
-            downloadUrl: data.result.downloadUrl,
-            title: data.result.title,
-            from
-        });
+        // Handler pour la réponse utilisateur
+        const handler = async (update) => {
+            const msg = update.messages?.[0];
+            if (!msg || !msg.message) return;
+
+            const fromUser = msg.key.participant || msg.key.remoteJid;
+            if (fromUser !== m.sender) return;  // Seulement la personne qui a lancé la commande
+
+            // Vérifie si c'est une reply au message du bot (stanzaId = id du message du bot)
+            const stanzaId = msg.message.extendedTextMessage?.contextInfo?.stanzaId;
+            if (stanzaId !== sentMsg.key.id) return;
+
+            // Texte de la réponse (conversation ou extendedTextMessage)
+            let text = msg.message.conversation || msg.message.extendedTextMessage?.text || "";
+            text = text.toLowerCase().trim();
+
+            if (text === "audio") {
+                await conn.sendMessage(from, {
+                    audio: { url: data.result.downloadUrl },
+                    mimetype: "audio/mpeg"
+                }, { quoted: msg });
+                conn.ev.off("messages.upsert", handler); // Supprime l’écouteur après usage
+            } else if (text === "document") {
+                await conn.sendMessage(from, {
+                    document: { url: data.result.downloadUrl },
+                    mimetype: "audio/mpeg",
+                    fileName: `${data.result.title}.mp3`,
+                    caption: "> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*"
+                }, { quoted: msg });
+                conn.ev.off("messages.upsert", handler); // Supprime l’écouteur après usage
+            } else {
+                await conn.sendMessage(from, {
+                    text: "❎ ɪɴᴠᴀʟɪᴅ ᴄʜᴏɪᴄᴇ. ᴘʟᴇᴀsᴇ ʀᴇᴘʟʏ ᴡɪᴛʜ *ᴀᴜᴅɪᴏ* ᴏʀ *ᴅᴏᴄᴜᴍᴇɴᴛ* ᴏɴʟʏ.",
+                }, { quoted: msg });
+            }
+        };
+
+        // On ajoute l'écouteur
+        conn.ev.on("messages.upsert", handler);
+
+        // Optionnel : après 5 min on supprime l'écouteur (évite fuite mémoire)
+        setTimeout(() => {
+            conn.ev.off("messages.upsert", handler);
+        }, 5 * 60 * 1000);
 
     } catch (err) {
         console.error(err);
         reply("❌ An error occurred. Please try again later.");
-    }
-});
-
-conn.ev.on("messages.upsert", async ({ messages }) => {
-    const msg = messages[0];
-    if (!msg.message) return;
-
-    let text = "";
-    if (msg.message.conversation) {
-        text = msg.message.conversation;
-    } else if (msg.message.extendedTextMessage && msg.message.extendedTextMessage.text) {
-        text = msg.message.extendedTextMessage.text;
-    } else {
-        return;
-    }
-
-    text = text.toLowerCase().trim();
-    const userId = msg.key.participant || msg.key.remoteJid;
-
-    if (!pendingChoices.has(userId)) return;
-
-    const choiceData = pendingChoices.get(userId);
-
-    if (text === "audio") {
-        await conn.sendMessage(choiceData.from, {
-            audio: { url: choiceData.downloadUrl },
-            mimetype: "audio/mpeg"
-        }, { quoted: msg });
-        pendingChoices.delete(userId);
-    } else if (text === "document") {
-        await conn.sendMessage(choiceData.from, {
-            document: { url: choiceData.downloadUrl },
-            mimetype: "audio/mpeg",
-            fileName: `${choiceData.title}.mp3`,
-            caption: "> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*"
-        }, { quoted: msg });
-        pendingChoices.delete(userId);
     }
 });
