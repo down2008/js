@@ -2,6 +2,8 @@ const { cmd } = require('../command');
 const fetch = require('node-fetch');
 const ytsearch = require('yt-search');
 
+const pendingChoices = new Map(); // userId -> { downloadUrl, title, from }
+
 cmd({
     pattern: "play",
     alias: ["mp3"],
@@ -12,28 +14,21 @@ cmd({
     filename: __filename
 }, async (conn, m, store, { from, prefix, quoted, q, reply }) => {
     try {
-        if (!q) {
-            return reply("*🎵 ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ʏᴏᴜᴛᴜʙᴇ ᴜʀʟ ᴏʀ sᴏɴɢ ɴᴀᴍᴇ.*");
-        }
+        if (!q) return reply("*🎵 ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ʏᴏᴜᴛᴜʙᴇ ᴜʀʟ ᴏʀ sᴏɴɢ ɴᴀᴍᴇ.*");
 
-        // Search YouTube
         const searchResult = await ytsearch(q);
-        if (!searchResult.videos || searchResult.videos.length === 0) {
+        if (!searchResult.videos || searchResult.videos.length === 0)
             return reply("❌ No results found!");
-        }
 
         const video = searchResult.videos[0];
         const apiUrl = `https://apis.davidcyriltech.my.id/youtube/mp3?url=${encodeURIComponent(video.url)}`;
 
-        // Fetch MP3 download info
         const res = await fetch(apiUrl);
         const data = await res.json();
 
-        if (data.status !== 200 || !data.success || !data.result.downloadUrl) {
-            return reply("⚠️ Failed to fetch the audio. Please try again later.");
-        }
+        if (data.status !== 200 || !data.success || !data.result.downloadUrl)
+            return reply("⚠️ ғᴀɪʟᴇᴅ ᴛᴏ ғᴇᴛᴄʜ ᴛʜᴇ ᴀᴜᴅɪᴏ. ᴘʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ.");
 
-        // Song Info
         const songInfo = `
 ╭── 『 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 』
 │ ⿻ *Title:* ${video.title}
@@ -42,45 +37,52 @@ cmd({
 │ ⿻ *Author:* ${video.author.name}
 │ ⿻ *Link:* ${video.url}
 ╰─────────────⭑─
-> *ʀᴇᴘʟʏ ᴡɪᴛʜ*  \`ᴀᴜᴅɪᴏ\` *ᴏʀ* \`ᴅᴏᴄᴜᴍᴇɴᴛ\` *ᴛᴏ ᴄʜᴏᴏsᴇ ᴛʜᴇ ғᴏʀᴍᴀᴛ.*
+> *ʀᴇᴘʟʏ ᴡɪᴛʜ* \`ᴀᴜᴅɪᴏ\` *ᴏʀ* \`ᴅᴏᴄᴜᴍᴇɴᴛ\` *ᴛᴏ ᴄʜᴏᴏsᴇ ᴛʜᴇ ғᴏʀᴍᴀᴛ.*
         `;
 
-        // Send Thumbnail & Ask for choice
-        const sentMsg = await conn.sendMessage(from, {
+        await conn.sendMessage(from, {
             image: { url: data.result.image || '' },
             caption: songInfo
         }, { quoted: m });
 
-        // Wait for user reply
-        const filter = msg => 
-            msg.key.remoteJid === from &&
-            msg.message?.conversation &&
-            msg.message.conversation.toLowerCase().trim() &&
-            msg.key.participant === m.sender;
-
-        conn.ev.on("messages.upsert", async ({ messages }) => {
-            const userMsg = messages[0];
-            if (!filter(userMsg)) return;
-
-            const choice = userMsg.message.conversation.toLowerCase().trim();
-
-            if (choice === "audio") {
-                await conn.sendMessage(from, {
-                    audio: { url: data.result.downloadUrl },
-                    mimetype: "audio/mpeg"
-                }, { quoted: userMsg });
-            } 
-            else if (choice === "document") {
-                await conn.sendMessage(from, {
-                    document: { url: data.result.downloadUrl },
-                    mimetype: "audio/mpeg",
-                    fileName: `${data.result.title}.mp3`,
-                    caption: "> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*"
-                }, { quoted: userMsg });
-            }
+        // Enregistre ce choix sans timeout (illimité)
+        pendingChoices.set(m.sender, {
+            downloadUrl: data.result.downloadUrl,
+            title: data.result.title,
+            from
         });
 
     } catch (err) {
         console.error(err);
         reply("❌ An error occurred. Please try again later.");
-   ᴘᴏᴡᴇʀᴇᴅ
+    }
+});
+
+// Listener global, à placer dans ton fichier principal
+conn.ev.on("messages.upsert", async ({ messages }) => {
+    const msg = messages[0];
+    if (!msg.message?.conversation) return;
+
+    const userId = msg.key.participant || msg.key.remoteJid;
+    const text = msg.message.conversation.toLowerCase().trim();
+
+    if (!pendingChoices.has(userId)) return;
+
+    const choiceData = pendingChoices.get(userId);
+
+    if (text === "audio") {
+        await conn.sendMessage(choiceData.from, {
+            audio: { url: choiceData.downloadUrl },
+            mimetype: "audio/mpeg"
+        }, { quoted: msg });
+        pendingChoices.delete(userId);  // Supprime après choix
+    } else if (text === "document") {
+        await conn.sendMessage(choiceData.from, {
+            document: { url: choiceData.downloadUrl },
+            mimetype: "audio/mpeg",
+            fileName: `${choiceData.title}.mp3`,
+            caption: "> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*"
+        }, { quoted: msg });
+        pendingChoices.delete(userId);  // Supprime après choix
+    }
+});
