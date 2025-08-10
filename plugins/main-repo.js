@@ -39,7 +39,7 @@ async (conn, mek, m, { from, reply }) => {
 │✞ *ʟᴀsᴛ ᴜᴘᴅᴀᴛᴇ:* ${lastUpdateDate}
 │✞ *ᴏᴡɴᴇʀ:* ${author}
 │✞ *ʀᴇᴘᴏsɪᴛᴏʀʏ:* ${repoInfo.url}
-│✞ *sᴇssɪᴏɴ:* meg-lodon-session.onrender.com/pair
+│✞ *sᴇssɪᴏɴ:* meg-lodon-session-1.onrender.com/pair
 ╰───────────────────`;
 
         // Télécharger l’image distante
