@@ -2,8 +2,8 @@ const { cmd } = require('../command');
 const fetch = require('node-fetch');
 const ytsearch = require('yt-search');
 
-// Stocke l'état des attentes par utilisateur et par chat
-const awaitingResponse = new Map();
+// Map pour garder l'état des utilisateurs en attente de choix
+const awaitingChoice = new Map();
 
 cmd({
     pattern: "play",
@@ -41,14 +41,13 @@ cmd({
 > *Reply to this message with* \`audio\` *or* \`document\` *to choose the format.*
         `;
 
-        // Envoie le message avec demande de reply
+        // Envoie le message et stocke l'état
         const sentMsg = await conn.sendMessage(from, {
             image: { url: data.result.image || '' },
             caption: songInfo
         }, { quoted: m });
 
-        // Stocke l'état d'attente (avec les infos du téléchargement)
-        awaitingResponse.set(m.sender, {
+        awaitingChoice.set(m.sender, {
             chat: from,
             stanzaId: sentMsg.key.id,
             downloadUrl: data.result.downloadUrl,
@@ -61,18 +60,19 @@ cmd({
     }
 });
 
-// Gestionnaire global pour les réponses utilisateurs
+// Écouteur global unique pour gérer les replies
+// Assure-toi que ceci est défini UNE seule fois au démarrage du bot
 conn.ev.on('messages.upsert', async ({ messages }) => {
     if (!messages || messages.length === 0) return;
     const msg = messages[0];
     if (!msg.message) return;
 
-    const fromUser = msg.key.participant || msg.key.remoteJid;
-    if (!awaitingResponse.has(fromUser)) return;
+    const userId = msg.key.participant || msg.key.remoteJid;
+    if (!awaitingChoice.has(userId)) return;
 
-    const state = awaitingResponse.get(fromUser);
+    const state = awaitingChoice.get(userId);
 
-    // Vérifie que c'est une réponse au bon message
+    // Vérifie que c'est une réponse au message du bot attendu
     const stanzaId = msg.message.extendedTextMessage?.contextInfo?.stanzaId;
     if (stanzaId !== state.stanzaId) return;
 
@@ -96,8 +96,7 @@ conn.ev.on('messages.upsert', async ({ messages }) => {
         await conn.sendMessage(state.chat, {
             text: "❎ Invalid choice. Please reply with *audio* or *document* only.",
         }, { quoted: msg });
-        return; // Ne pas clear l’état si choix invalide
+        return;
     }
-
-    // Laisse l'état pour permettre plusieurs envois (illimité)
+    // On ne supprime PAS l'état => l'utilisateur peut continuer à répondre
 });
