@@ -7,7 +7,7 @@ cmd({
     alias: ["mp3"],
     react: '🎶',
     desc: "Download a YouTube song",
-    category: "main",
+    category: "download",
     use: ".mp3 <YouTube URL or Song Name>",
     filename: __filename
 }, async (conn, m, store, { from, prefix, quoted, q, reply }) => {
