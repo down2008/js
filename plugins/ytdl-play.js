@@ -1,43 +1,72 @@
-const { cmd } = require('../command')
-const fetch = require('node-fetch')
+const { cmd } = require('../command');
+const fetch = require('node-fetch');
+const ytsearch = require('yt-search');
 
 cmd({
-  pattern: "play",
-  alias: ["song", "ytplay"],
-  desc: "Play audio from YouTube by song name.",
-  category: "download",
-  react: "🎶",
-  filename: __filename
-}, async (conn, m, msg, { text, args, prefix, command, reply }) => {
-  if (!text) return reply(`❌ *Please provide a song name to play.*\n\n*Example:* ${prefix + command} Perfect by Ed Sheeran`);
-
-  await conn.sendMessage(m.chat, { react: { text: "🎵", key: m.key } });
-
-  try {
-    let res = await fetch(`https://HansTz-hansapi.hf.space/yt?query=${encodeURIComponent(text)}`);
-    let data = await res.json();
-
-    if (!data || !data.url_audio) return reply("❌ Failed to fetch song. Try another name.");
-
-    await conn.sendMessage(m.chat, {
-      audio: { url: data.url_audio },
-      mimetype: 'audio/mp4',
-      fileName: `${data.title}.mp3`,
-      contextInfo: {
-        externalAdReply: {
-          title: `🎶 ${data.title}`,
-          body: "Now Playing",
-          thumbnailUrl: data.thumbnail,
-          mediaType: 1,
-          sourceUrl: data.url_audio,
-          renderLargerThumbnail: true,
-          showAdAttribution: true
+    pattern: "play",
+    alias: ["mp3"],
+    react: '🎶',
+    desc: "Download a YouTube song",
+    category: "main",
+    use: ".mp3 <YouTube URL or Song Name>",
+    filename: __filename
+}, async (conn, m, store, { from, prefix, quoted, q, reply }) => {
+    try {
+        if (!q) {
+            return reply("*🎵 ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ʏᴏᴜᴛᴜʙᴇ ᴜʀʟ ᴏʀ sᴏɴɢ ɴᴀᴍᴇ.*");
         }
-      }
-    }, { quoted: m });
 
-  } catch (err) {
-    console.error("Play Plugin Error:", err);
-    reply("❌ An error occurred while fetching the song.");
-  }
-})
+        // Search YouTube
+        const searchResult = await ytsearch(q);
+        if (!searchResult.results || searchResult.results.length === 0) {
+            return reply("❌ No results found!");
+        }
+
+        const video = searchResult.results[0];
+        const apiUrl = `https://apis.davidcyriltech.my.id/youtube/mp3?url=${encodeURIComponent(video.url)}`;
+
+        // Fetch MP3 download info
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+
+        if (data.status !== 200 || !data.success || !data.result.downloadUrl) {
+            return reply("⚠️ Failed to fetch the audio. Please try again later.");
+        }
+
+        // Song Info Message
+        const songInfo = `
+╭── 『 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 』
+│ ⿻ *Title:* ${video.title}
+│ ⿻ *Duration:* ${video.timestamp}
+│ ⿻ *Views:* ${video.views}
+│ ⿻ *Author:* ${video.author.name}
+│ ⿻ *Link:* ${video.url}
+╰─────────────⭑─
+> *ᴇɴᴊᴏʏ ʏᴏᴜʀ ᴍᴜsɪᴄ 🎶*
+        `;
+
+        // Send Thumbnail & Info
+        await conn.sendMessage(from, {
+            image: { url: data.result.image || '' },
+            caption: songInfo
+        }, { quoted: m });
+
+        // Send Audio
+        await conn.sendMessage(from, {
+            audio: { url: data.result.downloadUrl },
+            mimetype: "audio/mpeg"
+        }, { quoted: m });
+
+        // Send as Document
+        await conn.sendMessage(from, {
+            document: { url: data.result.downloadUrl },
+            mimetype: "audio/mpeg",
+            fileName: `${data.result.title}.mp3`,
+            caption: "> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*"
+        }, { quoted: m });
+
+    } catch (err) {
+        console.error(err);
+        reply("❌ An error occurred. Please try again later.");
+    }
+});
