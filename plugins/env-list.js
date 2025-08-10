@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const axios = require('axios');
 const config = require('../config');
 const { cmd } = require('../command');
 
@@ -16,12 +17,9 @@ function updateEnvVariable(key, value) {
 
     fs.writeFileSync(envPath, env);
 
-    // ری‌لود کردن dotenv و config
     require('dotenv').config({ path: envPath });
-
-    // پاک‌سازی کش config
     delete require.cache[require.resolve('../config')];
-    Object.assign(config, require('../config'));  // ری‌لود
+    Object.assign(config, require('../config'));
 }
 
 function isEnabled(value) {
@@ -35,8 +33,8 @@ cmd({
     category: "owner",
     react: "⚙️",
     filename: __filename
-}, 
-async (conn, mek, m, { from, reply, isCreator, isOwner }) => {
+}, async (conn, mek, m, { from, reply, isCreator, isOwner }) => {
+
     if (!isOwner && !isCreator) return reply("ᴄᴏᴍᴍᴀɴᴅ ʀᴇsᴇʀᴠᴇᴅ ғᴏʀ ᴏᴡɴᴇʀ ᴀɴᴅ ᴍʏ ᴄʀᴇᴀᴛᴏʀ ᴀʟᴏɴᴇ");
 
     const menu = `╭━━━〔 *𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃* 〕━━━┈⊷
@@ -44,10 +42,10 @@ async (conn, mek, m, { from, reply, isCreator, isOwner }) => {
 ┃▸┃๏ *𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 𝐒𝐄𝐓𝐓𝐈𝐍𝐆𝐒*
 ┃▸└───────────···๏
 ╰────────────────┈⊷
-┇๏ *1. ᴀᴜᴛᴏ ғᴇᴀᴛᴜ
-┇๏1.2 - 𝐀𝐔𝐓𝐎_𝐑𝐄𝐀𝐂𝐓 (${isEnabled(config.AUTO_REACT) ? "✅" : "❌"})
+┇๏ *1. ᴀᴜᴛᴏ ғᴇᴀᴛᴜ*
+┇๏ 1.2 - 𝐀𝐔𝐓𝐎_𝐑𝐄𝐀𝐂𝐓 (${isEnabled(config.AUTO_REACT) ? "✅" : "❌"})
 ┇๏━━━━━━━━━━━━──┈⊷
-┇๏*2. sᴇᴄᴜʀɪᴛʏ*
+┇๏ *2. sᴇᴄᴜʀɪᴛʏ*
 ┇๏ 2.1 - 𝐀𝐍𝐓𝐈_𝐋𝐈𝐍𝐊 (${isEnabled(config.ANTI_LINK) ? "✅" : "❌"})
 ┇๏ 2.2 - 𝐀𝐍𝐓𝐈_𝐁𝐀𝐃 (${isEnabled(config.ANTI_BAD) ? "✅" : "❌"})
 ┇๏ 2.3 - 𝐃𝐄𝐋𝐄𝐓𝐄_𝐋𝐈𝐍𝐊𝐒 (${isEnabled(config.DELETE_LINKS) ? "✅" : "❌"})
@@ -70,48 +68,55 @@ async (conn, mek, m, { from, reply, isCreator, isOwner }) => {
 _ʀᴇᴘʟʏ ᴡɪᴛʜ: 1.1, 2.2, ᴇᴛᴄ ᴛᴏ ᴛᴏɢɢʟᴇ ᴏɴ/ᴏғғ_
 `;
 
+    // Télécharger l'image en buffer
+    const { data: imageBuffer } = await axios.get(config.MENU_IMAGE_URL, { responseType: "arraybuffer" });
+    const caption = menu;
+
+    // Envoyer le menu
     const sent = await conn.sendMessage(from, {
-         image: { url: config.MENU_IMAGE_URL }
-            caption: menu,
-            contextInfo: {
-                mentionedJid: [m.sender],
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363401051937059@newsletter',
-                    newsletterName: '𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃',
-                    serverMessageId: 143
-                }
+        image: imageBuffer,
+        caption,
+        contextInfo: {
+            mentionedJid: [m.sender],
+            forwardingScore: 999,
+            isForwarded: true,
+            forwardedNewsletterMessageInfo: {
+                newsletterJid: '120363401051937059@newsletter',
+                newsletterName: '𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃',
+                serverMessageId: 143
             }
-        }, { quoted: mek });
+        }
+    }, { quoted: mek });
 
     const messageID = sent.key.id;
 
     const toggleSetting = (key) => {
         const current = isEnabled(config[key]);
         updateEnvVariable(key, current ? "false" : "true");
-        return `✅ *${key}* ɪs ɴᴏᴡ sᴇᴛ ᴛᴏ: *${!current ? "ON" : "OFF"}*`;
+        return `✅ *${key}* is now: *${!current ? "ON" : "OFF"}*`;
+    };
+
+    const map = {
+        "1.2": "AUTO_REACT",
+        "2.1": "ANTI_LINK", "2.2": "ANTI_BAD", "2.3": "DELETE_LINKS",
+        "3.1": "AUTO_STATUS_SEEN", "3.2": "AUTO_STATUS_REPLY", "3.3": "AUTO_STATUS_REACT",
+        "4.1": "ALWAYS_ONLINE", "4.2": "READ_MESSAGE", "4.3": "READ_CMD", "4.4": "PUBLIC_MODE",
+        "5.1": "AUTO_TYPING", "5.2": "AUTO_RECORDING"
     };
 
     const handler = async (msgData) => {
         const msg = msgData.messages[0];
-        const quotedId = msg?.message?.extendedTextMessage?.contextInfo?.stanzaId;
+        if (!msg.message) return;
 
+        const quotedId = msg?.message?.extendedTextMessage?.contextInfo?.stanzaId;
         if (quotedId !== messageID) return;
 
         const text = msg.message?.conversation || msg.message?.extendedTextMessage?.text || "";
+        const key = map[text.trim()];
 
-        const map = {
-    "1.2": "AUTO_REACT",
-    "2.1": "ANTI_LINK", "2.2": "ANTI_BAD", "2.3": "DELETE_LINKS",
-    "3.1": "AUTO_STATUS_SEEN", "3.2": "AUTO_STATUS_REPLY", "3.3": "AUTO_STATUS_REACT",
-    "4.1": "ALWAYS_ONLINE", "4.2": "READ_MESSAGE", "4.3": "READ_CMD", "4.4": "PUBLIC_MODE",
-    "5.1": "AUTO_TYPING", "5.2": "AUTO_RECORDING"
-};
-
-        const key = map[text];
-
-        if (!key) return conn.sendMessage(from, { text: "ʀᴇᴘʟʏ ᴡɪᴛʜ ᴀɴ ᴀᴠᴀɪʟᴀʙʟᴇ ɴᴜᴍʙᴇʀ." }, { quoted: msg });
+        if (!key) {
+            return conn.sendMessage(from, { text: "❌ Invalid option." }, { quoted: msg });
+        }
 
         const res = toggleSetting(key);
         await conn.sendMessage(from, { text: res }, { quoted: msg });
