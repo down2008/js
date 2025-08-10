@@ -18,11 +18,11 @@ cmd({
 
         // Search YouTube
         const searchResult = await ytsearch(q);
-        if (!searchResult.results || searchResult.results.length === 0) {
+        if (!searchResult.videos || searchResult.videos.length === 0) {
             return reply("❌ No results found!");
         }
 
-        const video = searchResult.results[0];
+        const video = searchResult.videos[0];
         const apiUrl = `https://apis.davidcyriltech.my.id/youtube/mp3?url=${encodeURIComponent(video.url)}`;
 
         // Fetch MP3 download info
