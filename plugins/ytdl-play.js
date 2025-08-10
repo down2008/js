@@ -2,33 +2,32 @@ const { cmd } = require('../command');
 const fetch = require('node-fetch');
 const ytsearch = require('yt-search');
 
-const awaiting = new Map();
-
 cmd({
-    pattern: "play",
-    alias: ["mp3"],
-    react: '🎶',
-    desc: "Download a YouTube song",
-    category: "download",
-    use: ".mp3 <YouTube URL or Song Name>",
-    filename: __filename
-}, async (conn, m, store, { from, q, reply }) => {
+  pattern: "play",
+  alias: ["mp3"],
+  react: '🎶',
+  desc: "Download a YouTube song",
+  category: "download",
+  use: ".mp3 <YouTube URL or Song Name>",
+  filename: __filename
+}, async (conn, mek, m, { from, q, reply }) => {
+  try {
     if (!q) return reply("*🎵 Please provide a YouTube URL or song name.*");
 
-    try {
-        const searchResult = await ytsearch(q);
-        if (!searchResult.videos.length) return reply("❌ No results found!");
+    const searchResult = await ytsearch(q);
+    if (!searchResult.videos.length) return reply("❌ No results found!");
 
-        const video = searchResult.videos[0];
-        const apiUrl = `https://apis.davidcyriltech.my.id/youtube/mp3?url=${encodeURIComponent(video.url)}`;
+    const video = searchResult.videos[0];
+    const apiUrl = `https://apis.davidcyriltech.my.id/youtube/mp3?url=${encodeURIComponent(video.url)}`;
 
-        const res = await fetch(apiUrl);
-        const data = await res.json();
+    const res = await fetch(apiUrl);
+    const data = await res.json();
 
-        if (data.status !== 200 || !data.success || !data.result.downloadUrl)
-            return reply("⚠️ Failed to fetch audio. Please try again later.");
+    if (data.status !== 200 || !data.success || !data.result.downloadUrl)
+      return reply("⚠️ Failed to fetch audio. Please try again later.");
 
-        const infoText = `
+    // Construction du message d’invite
+    let menuText = `
 ╭── 『 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 』
 │ ⿻ *Title:* ${video.title}
 │ ⿻ *Duration:* ${video.timestamp}
@@ -36,64 +35,66 @@ cmd({
 │ ⿻ *Author:* ${video.author.name}
 │ ⿻ *Link:* ${video.url}
 ╰─────────────⭑─
-Reply *with quote* to this message:
-\`1\` to receive the audio
-\`2\` to receive the document
-        `.trim();
+📌 *ʀᴇᴘʟʏ ᴡɪᴛʜ ᴛʜᴇ ɴᴜᴍʙᴇʀ ᴛᴏ ᴄʜᴏᴏsᴇ:* 
+1. Audio
+2. Document
+`;
 
-        const sentMsg = await conn.sendMessage(from, {
-            image: { url: data.result.image || '' },
-            caption: infoText
-        }, { quoted: m });
+    // Envoie du menu en citant la commande
+    const sentMsg = await conn.sendMessage(from, {
+      image: { url: data.result.image || '' },
+      caption: menuText
+    }, { quoted: m });
 
-        awaiting.set(m.sender, {
-            chat: from,
-            stanzaId: sentMsg.key.id,
-            url: data.result.downloadUrl,
-            title: data.result.title
-        });
+    // On garde en mémoire l’id du message envoyé et les infos
+    const messageID = sentMsg.key.id;
 
-    } catch (e) {
-        console.error(e);
-        reply("❌ An error occurred. Please try again later.");
-    }
-});
+    // Handler d’écoute des réponses
+    const messageHandler = async (msgData) => {
+      const receivedMsg = msgData.messages?.[0];
+      if (!receivedMsg || !receivedMsg.message) return;
 
-conn.ev.on('messages.upsert', async ({ messages }) => {
-    if (!messages.length) return;
-    const msg = messages[0];
-    if (!msg.message) return;
+      const senderID = receivedMsg.key.participant || receivedMsg.key.remoteJid;
+      // On filtre que ce soit la même personne qui a envoyé la commande
+      if (senderID !== m.sender) return;
 
-    const userId = msg.key.participant || msg.key.remoteJid;
+      // On vérifie que la réponse est bien en reply au menu (stanzaId)
+      const isReplyToBot = receivedMsg.message.extendedTextMessage?.contextInfo?.stanzaId === messageID;
+      if (!isReplyToBot) return;
 
-    if (!awaiting.has(userId)) return;
+      // Texte de la réponse
+      const receivedText = (receivedMsg.message.conversation || receivedMsg.message.extendedTextMessage?.text || "").trim();
 
-    const state = awaiting.get(userId);
+      if (receivedText === "1") {
+        await conn.sendMessage(from, {
+          audio: { url: data.result.downloadUrl },
+          mimetype: "audio/mpeg"
+        }, { quoted: receivedMsg });
+      } else if (receivedText === "2") {
+        await conn.sendMessage(from, {
+          document: { url: data.result.downloadUrl },
+          mimetype: "audio/mpeg",
+          fileName: `${data.result.title}.mp3`,
+          caption: "> *© Powered by Dyby Tech*"
+        }, { quoted: receivedMsg });
+      } else {
+        await conn.sendMessage(from, {
+          text: "❎ Invalid choice. Please reply with *1* or *2* only.",
+        }, { quoted: receivedMsg });
+      }
+    };
 
-    const stanzaId = msg.message.extendedTextMessage?.contextInfo?.stanzaId;
-    if (stanzaId !== state.stanzaId) return;
+    // On ajoute l’écouteur global
+    conn.ev.on("messages.upsert", messageHandler);
 
-    let text = msg.message.conversation || msg.message.extendedTextMessage?.text || "";
-    text = text.toLowerCase().trim();
+    // Tu peux gérer la suppression de l’écouteur après X temps si tu veux
+    // Par exemple après 10 minutes:
+    // setTimeout(() => {
+    //   conn.ev.off("messages.upsert", messageHandler);
+    // }, 10 * 60 * 1000);
 
-    if (text === '1') {
-        await conn.sendMessage(state.chat, {
-            audio: { url: state.url },
-            mimetype: 'audio/mpeg'
-        }, { quoted: msg });
-
-    } else if (text === '2') {
-        await conn.sendMessage(state.chat, {
-            document: { url: state.url },
-            mimetype: 'audio/mpeg',
-            fileName: `${state.title}.mp3`,
-            caption: '> *© Powered by Dyby Tech*'
-        }, { quoted: msg });
-
-    } else {
-        await conn.sendMessage(state.chat, {
-            text: "❎ Invalid choice. Reply *with quote*:\n`1` for audio or `2` for document only.",
-        }, { quoted: msg });
-    }
-    // Ne supprime pas l'état pour permettre réponses illimitées
+  } catch (error) {
+    console.error("❌ Error in .play command:", error);
+    reply("⚠️ An error occurred while processing your request.");
+  }
 });
