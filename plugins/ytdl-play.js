@@ -2,8 +2,7 @@ const { cmd } = require('../command');
 const fetch = require('node-fetch');
 const ytsearch = require('yt-search');
 
-// Map pour garder l'état des utilisateurs en attente de choix
-const awaitingChoice = new Map();
+const awaiting = new Map();
 
 cmd({
     pattern: "play",
@@ -13,13 +12,12 @@ cmd({
     category: "download",
     use: ".mp3 <YouTube URL or Song Name>",
     filename: __filename
-}, async (conn, m, store, { from, prefix, quoted, q, reply }) => {
-    try {
-        if (!q) return reply("*🎵 Please provide a YouTube URL or song name.*");
+}, async (conn, m, store, { from, q, reply }) => {
+    if (!q) return reply("*🎵 Please provide a YouTube URL or song name.*");
 
+    try {
         const searchResult = await ytsearch(q);
-        if (!searchResult.videos || searchResult.videos.length === 0)
-            return reply("❌ No results found!");
+        if (!searchResult.videos.length) return reply("❌ No results found!");
 
         const video = searchResult.videos[0];
         const apiUrl = `https://apis.davidcyriltech.my.id/youtube/mp3?url=${encodeURIComponent(video.url)}`;
@@ -28,9 +26,9 @@ cmd({
         const data = await res.json();
 
         if (data.status !== 200 || !data.success || !data.result.downloadUrl)
-            return reply("⚠️ Failed to fetch the audio. Please try again later.");
+            return reply("⚠️ Failed to fetch audio. Please try again later.");
 
-        const songInfo = `
+        const infoText = `
 ╭── 『 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 』
 │ ⿻ *Title:* ${video.title}
 │ ⿻ *Duration:* ${video.timestamp}
@@ -38,65 +36,64 @@ cmd({
 │ ⿻ *Author:* ${video.author.name}
 │ ⿻ *Link:* ${video.url}
 ╰─────────────⭑─
-> *Reply to this message with* \`audio\` *or* \`document\` *to choose the format.*
-        `;
+Reply *with quote* to this message:
+\`1\` to receive the audio
+\`2\` to receive the document
+        `.trim();
 
-        // Envoie le message et stocke l'état
         const sentMsg = await conn.sendMessage(from, {
             image: { url: data.result.image || '' },
-            caption: songInfo
+            caption: infoText
         }, { quoted: m });
 
-        awaitingChoice.set(m.sender, {
+        awaiting.set(m.sender, {
             chat: from,
             stanzaId: sentMsg.key.id,
-            downloadUrl: data.result.downloadUrl,
+            url: data.result.downloadUrl,
             title: data.result.title
         });
 
-    } catch (err) {
-        console.error(err);
+    } catch (e) {
+        console.error(e);
         reply("❌ An error occurred. Please try again later.");
     }
 });
 
-// Écouteur global unique pour gérer les replies
-// Assure-toi que ceci est défini UNE seule fois au démarrage du bot
 conn.ev.on('messages.upsert', async ({ messages }) => {
-    if (!messages || messages.length === 0) return;
+    if (!messages.length) return;
     const msg = messages[0];
     if (!msg.message) return;
 
     const userId = msg.key.participant || msg.key.remoteJid;
-    if (!awaitingChoice.has(userId)) return;
 
-    const state = awaitingChoice.get(userId);
+    if (!awaiting.has(userId)) return;
 
-    // Vérifie que c'est une réponse au message du bot attendu
+    const state = awaiting.get(userId);
+
     const stanzaId = msg.message.extendedTextMessage?.contextInfo?.stanzaId;
     if (stanzaId !== state.stanzaId) return;
 
-    // Récupère le texte de la réponse
     let text = msg.message.conversation || msg.message.extendedTextMessage?.text || "";
     text = text.toLowerCase().trim();
 
-    if (text === "audio") {
+    if (text === '1') {
         await conn.sendMessage(state.chat, {
-            audio: { url: state.downloadUrl },
-            mimetype: "audio/mpeg"
+            audio: { url: state.url },
+            mimetype: 'audio/mpeg'
         }, { quoted: msg });
-    } else if (text === "document") {
+
+    } else if (text === '2') {
         await conn.sendMessage(state.chat, {
-            document: { url: state.downloadUrl },
-            mimetype: "audio/mpeg",
+            document: { url: state.url },
+            mimetype: 'audio/mpeg',
             fileName: `${state.title}.mp3`,
-            caption: "> *© Powered by Dyby Tech*"
+            caption: '> *© Powered by Dyby Tech*'
         }, { quoted: msg });
+
     } else {
         await conn.sendMessage(state.chat, {
-            text: "❎ Invalid choice. Please reply with *audio* or *document* only.",
+            text: "❎ Invalid choice. Reply *with quote*:\n`1` for audio or `2` for document only.",
         }, { quoted: msg });
-        return;
     }
-    // On ne supprime PAS l'état => l'utilisateur peut continuer à répondre
+    // Ne supprime pas l'état pour permettre réponses illimitées
 });
