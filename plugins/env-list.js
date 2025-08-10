@@ -70,7 +70,7 @@ async (conn, mek, m, { from, reply, isCreator, isOwner }) => {
 _ʀᴇᴘʟʏ ᴡɪᴛʜ: 1.1, 2.2, ᴇᴛᴄ ᴛᴏ ᴛᴏɢɢʟᴇ ᴏɴ/ᴏғғ_
 `;
 
-    const sent = conn.sendMessage(from, {
+    const sent = await conn.sendMessage(from, {
          image: { url: config.MENU_IMAGE_URL }
             caption: menu,
             contextInfo: {
