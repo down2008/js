@@ -33,7 +33,7 @@ cmd({
             return reply("⚠️ Failed to fetch the audio. Please try again later.");
         }
 
-        // Song Info Message
+        // Song Info
         const songInfo = `
 ╭── 『 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 』
 │ ⿻ *Title:* ${video.title}
@@ -42,31 +42,45 @@ cmd({
 │ ⿻ *Author:* ${video.author.name}
 │ ⿻ *Link:* ${video.url}
 ╰─────────────⭑─
-> *ᴇɴᴊᴏʏ ʏᴏᴜʀ ᴍᴜsɪᴄ 🎶*
+> *ʀᴇᴘʟʏ ᴡɪᴛʜ*  \`ᴀᴜᴅɪᴏ\` *ᴏʀ* \`ᴅᴏᴄᴜᴍᴇɴᴛ\` *ᴛᴏ ᴄʜᴏᴏsᴇ ᴛʜᴇ ғᴏʀᴍᴀᴛ.*
         `;
 
-        // Send Thumbnail & Info
-        await conn.sendMessage(from, {
+        // Send Thumbnail & Ask for choice
+        const sentMsg = await conn.sendMessage(from, {
             image: { url: data.result.image || '' },
             caption: songInfo
         }, { quoted: m });
 
-        // Send Audio
-        await conn.sendMessage(from, {
-            audio: { url: data.result.downloadUrl },
-            mimetype: "audio/mpeg"
-        }, { quoted: m });
+        // Wait for user reply
+        const filter = msg => 
+            msg.key.remoteJid === from &&
+            msg.message?.conversation &&
+            msg.message.conversation.toLowerCase().trim() &&
+            msg.key.participant === m.sender;
 
-        // Send as Document
-        await conn.sendMessage(from, {
-            document: { url: data.result.downloadUrl },
-            mimetype: "audio/mpeg",
-            fileName: `${data.result.title}.mp3`,
-            caption: "> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*"
-        }, { quoted: m });
+        conn.ev.on("messages.upsert", async ({ messages }) => {
+            const userMsg = messages[0];
+            if (!filter(userMsg)) return;
+
+            const choice = userMsg.message.conversation.toLowerCase().trim();
+
+            if (choice === "audio") {
+                await conn.sendMessage(from, {
+                    audio: { url: data.result.downloadUrl },
+                    mimetype: "audio/mpeg"
+                }, { quoted: userMsg });
+            } 
+            else if (choice === "document") {
+                await conn.sendMessage(from, {
+                    document: { url: data.result.downloadUrl },
+                    mimetype: "audio/mpeg",
+                    fileName: `${data.result.title}.mp3`,
+                    caption: "> *© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*"
+                }, { quoted: userMsg });
+            }
+        });
 
     } catch (err) {
         console.error(err);
         reply("❌ An error occurred. Please try again later.");
-    }
-});
+   ᴘᴏᴡᴇʀᴇᴅ
