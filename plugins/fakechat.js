@@ -3,16 +3,16 @@ const { cmd } = require('../command');
 
 cmd({
   pattern: "fakechat",
-  alias: ["fake-chat","fakechatimg"],
+  alias: ["fake-chat","iphone"],
   react: '🖼️',
   desc: "Generate fake chat image via veloria.my.id imagecreator",
-  category: "download",
+  category: "fun",
   use: ".fakechat 12:00|Hi bro|100  OR  .fakechat Hi bro",
   filename: __filename
 }, async (conn, mek, m, { from, reply, args }) => {
   try {
     if (!args || args.length === 0) {
-      return reply("*Usage:* .fakechat 12:00|Hi bro|100  OR  .fakechat Hi bro");
+      return reply("*Uᴜsᴀɢᴇ* .ғᴀᴋᴇᴄʜᴀᴛ12:00|Hi bʙʀᴏ100  ᴏʀ .ғᴀᴋᴇᴄʜᴀᴛ ʜɪ ʙʀᴏ);
     }
 
     // Build inputs
@@ -47,7 +47,7 @@ cmd({
     // send image
     await conn.sendMessage(from, {
       image: imageBuffer,
-      caption: `Fake chat — ${messageText}\nTime: ${time} • Battery: ${batteryPercentage}%`
+      caption: `Fᴀᴋᴇ ᴄʜᴀᴛ— ${messageText}\nᴛɪᴍᴇ ${time} • ʙᴀᴛᴛᴇʀʏ ${batteryPercentage}%`
     }, { quoted: m });
 
   } catch (err) {
