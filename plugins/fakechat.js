@@ -12,7 +12,7 @@ cmd({
 }, async (conn, mek, m, { from, reply, args }) => {
   try {
     if (!args || args.length === 0) {
-      return reply("*Uᴜsᴀɢᴇ* .ғᴀᴋᴇᴄʜᴀᴛ12:00|Hi bʙʀᴏ100  ᴏʀ .ғᴀᴋᴇᴄʜᴀᴛ ʜɪ ʙʀᴏ);
+      return reply("*Uᴜsᴀɢᴇ* .ғᴀᴋᴇᴄʜᴀᴛ12:00|Hi bʙʀᴏ100  ᴏʀ .ғᴀᴋᴇᴄʜᴀᴛ ʜɪ ʙʀᴏ");
     }
 
     // Build inputs
