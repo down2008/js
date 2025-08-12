@@ -35,7 +35,6 @@ const {
   const StickersTypes = require('wa-sticker-formatter')
   const util = require('util')
   const { sms, downloadMediaMessage, AntiDelete } = require('./lib')
-  const { updateActivity } = require('./lib/activity')
   const { registerGroupMessages } = require('./plugins/groupMessages')
   const FileType = require('file-type');
   const { File } = require('megajs');
@@ -111,7 +110,7 @@ async function loadSession() {
         } 
         // Otherwise try MEGA.nz download
         else {
-            console.log('Downloading MEGAsd session...');
+            console.log('DOWNLOADING MEGA SESSION...');
             
 const megaFileId = config.SESSION_ID.startsWith('MEGALODON~MD~') 
     ? config.SESSION_ID.replace("MEGALODON~MD~", "") 
@@ -186,11 +185,11 @@ conn.ev.on('connection.update', async (update) => {
                     require(path.join(pluginPath, plugin));
                 }
             });
-            console.log('Plugins installed successfully ✅');
+            console.log('PLUGINS INSTALLED SUCCESSFULLY  ✅');
 
     try {
 		// const username = config.REPO.split('/').slice(3, 4)[0];
- const botname = "—𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 "; //add your name
+ const botname = "—𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍"; //add your name
  const ownername = "𝐒ʊ̊𝐏𝐏๏፝֟ɼʈ⎯꯭̽💀"; // add your name
  const ali = { 
  key: { 
@@ -400,7 +399,7 @@ setupLinkDetection(conn);
     }
 	  
    const newsletterJids = ["120363401051937059@newsletter"];
-  const emojis = ["❤️", "👍", "😮", "😎", "💀", "💫", "🔥", "👑"];
+  const emojis = ["❤️", "👍", "😮", "😎", "💀", "💫", "🔥", "👑", "⚡️", "🙂", "😱"];
 
   if (mek.key && newsletterJids.includes(mek.key.remoteJid)) {
     try {
