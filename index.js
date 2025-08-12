@@ -190,7 +190,7 @@ conn.ev.on('connection.update', async (update) => {
 
     try {
 		// const username = config.REPO.split('/').slice(3, 4)[0];
- const botname = "—˹ᛗꍟꁅꍏ꒒ꂦꀸꂦꈤ "; //add your name
+ const botname = "—𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍- "; //add your name
  const ownername = "𝐒ʊ̊𝐏𝐏๏፝֟ɼʈ⎯꯭̽💀"; // add your name
  const ali = { 
  key: { 
