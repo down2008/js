@@ -132,7 +132,7 @@ let up = `> *╭──────────────●●*
     conn.sendMessage(conn.user.id, { image: { url: config.MENU_IMAGE_URL }, caption: up })
   }
   })
-  conn.ev.on('creds.update', saveCreds)
+  conn.ev.on('creds.update', saveCreds);
 
  // ==================================
   
