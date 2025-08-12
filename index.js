@@ -190,9 +190,9 @@ conn.ev.on('connection.update', async (update) => {
 
     try {
 		// const username = config.REPO.split('/').slice(3, 4)[0];
- const botname = "—𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍- "; //add your name
+ const botname = "—𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍"; //add your name
  const ownername = "𝐒ʊ̊𝐏𝐏๏፝֟ɼʈ⎯꯭̽💀"; // add your name
- const ali = { 
+ const dyby = { 
  key: { 
   remoteJid: 'status@broadcast', 
   participant: '0@s.whatsapp.net' 
@@ -209,10 +209,10 @@ message:{
 			
 			
 			
-	     const username = `itx-alii-raza`;
+	     const username = `DybyTech`;
              const mrfrank = `https://github.com/${username}`;
 	
-                    const upMessage = `> *╭──────────────●●*
+                    const upMessage = `> *╭──────────────○*
 > *➺ ᴍᴇɢᴀʟᴏᴅᴏɴ ᴍᴅ ᴄᴏɴɴᴇᴄᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʏ ᴛʏᴘᴇ*
 > *${prefix}ᴍᴇɴᴜ ᴛᴏ sᴇᴇ ᴛʜᴇ ғᴜʟʟ ᴄᴏᴍᴍᴀɴᴅ ʟɪsᴛ💫*
 > *ᴊᴏɪɴ ᴏᴜʀ ᴡʜᴀᴛsᴀᴘᴘ ᴄʜᴀɴɴᴇʟ ғᴏʀ ᴜᴘᴅᴀᴛᴇs ʙᴏᴛ*
@@ -221,14 +221,14 @@ message:{
 
 > ➳ ᴘʀᴇғɪx 『 ${prefix} 』
 > ➳ ᴍᴏᴅᴇ 〔〔${mode}〕〕
-> ╰──────────────●●
+> ╰──────────────○
 > *ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*`;
                     
                     await conn.sendMessage(conn.user.id, { 
                         image: { url: CONFIG.MENU_IMAGE_URL }, 
 			ai: true,
                         caption: upMessage},{
-			quoted: ali
+			quoted: dyby
                     });
 		
 
