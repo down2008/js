@@ -11,7 +11,7 @@ cmd({
   desc: "Show styled alive menu",
   category: "main",
   use: ".alive",
-  react: "👋",
+  react: "🤖",
   filename: __filename
 }, async (conn, mek, m, { from, pushname, reply }) => {
   try {
