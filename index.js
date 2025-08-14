@@ -188,30 +188,29 @@ conn.ev.on('connection.update', async (update) => {
             console.log('Plugins installed successfully ✅');
 
     try {
-		// const username = config.REPO.split('/').slice(3, 4)[0];
- const botname = "𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍"; //add your name
- const ownername = "-𝐌𝐃"; // add your name
- const ali = { 
- key: { 
-  remoteJid: 'status@broadcast', 
-  participant: '0@s.whatsapp.net' 
-   }, 
-message:{ 
-  newsletterAdminInviteMessage: { 
-    newsletterJid: '120363318387454868@newsletter', //add your channel jid
-    newsletterName: "𝐈𝐂𝐘 𝐁𝐎𝐓", //add your bot name
-    caption: botname + ` 𝐌Ɗ ` + ownername, 
-    inviteExpiration: 0
-  }
- }
-}
-			
-			
-			
-	     const username = `DybyTech`;
-             const mrfrank = `https://github.com/${username}`;
-	
-                    const upMessage = `> *╭────────────────────◇*
+		
+const botname = "MEGALODON"; // Bot name
+const ownername = "SUPPORT"; // Owner name
+
+const ali = { 
+    key: { 
+        remoteJid: 'status@broadcast', 
+        participant: '0@s.whatsapp.net' 
+    }, 
+    message: { 
+        newsletterAdminInviteMessage: { 
+            newsletterJid: '120363401051937059@newsletter', // Your channel JID
+            newsletterName: "𝐈𝐂𝐘 𝐁𝐎𝐓", // Newsletter name
+            caption: `${botname} 𝐌Ɗ ${ownername}`, 
+            inviteExpiration: 0
+        }
+    }
+};
+
+const username = `DybyTech`;
+const mrfrank = `https://github.com/${username}`;
+
+const upMessage = `> *╭────────────────────◇*
 > *│•* *➺ ᴍᴇɢᴀʟᴏᴅᴏɴ ᴍᴅ ᴄᴏɴɴᴇᴄᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʏ ᴛʏᴘᴇ*
 > *│•* *${prefix}ᴍᴇɴᴜ ᴛᴏ sᴇᴇ ᴛʜᴇ ғᴜʟʟ ᴄᴏᴍᴍᴀɴᴅ ʟɪsᴛ💫*
 > *│•* *ᴊᴏɪɴ ᴏᴜʀ ᴡʜᴀᴛsᴀᴘᴘ ᴄʜᴀɴɴᴇʟ ғᴏʀ ᴜᴘᴅᴀᴛᴇs ʙᴏᴛ*
@@ -222,13 +221,15 @@ message:{
 >*│•* ➳ ᴍᴏᴅᴇ 〔〔${mode}〕〕
 > ╰────────────────────○
 > *ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*`;
-                    
-                    await conn.sendMessage(conn.user.id, { 
-                        image: { url: CONFIG.MENU_IMAGE_URL }, 
-			ai: true,
-                        caption: upMessage},{
-			quoted: ali
-                    });
+
+await conn.sendMessage(
+    conn.user.id, 
+    { 
+        image: { url: CONFIG.MENU_IMAGE_URL }, 
+        caption: upMessage
+    },
+    { quoted: ali }
+);
 		
 
                     
