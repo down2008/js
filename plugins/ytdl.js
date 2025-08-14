@@ -8,7 +8,7 @@ cmd({
     pattern: "play4", 
     alias: ["yta4"], 
     react: "☘️", 
-    desc: "Download YouTube song via JawadTech API", 
+    desc: "Download YouTube song via David API", 
     category: "main", 
     use: '.play2 <query or youtube url>', 
     filename: __filename 
@@ -25,7 +25,7 @@ cmd({
             ytUrl = yt.results[0].url;
         }
 
-        const apiUrl = `https://jawad-tech.vercel.app/download/ytmp3?url=${encodeURIComponent(ytUrl)}`;
+        const apiUrl = `https://apis.davidcyriltech.my.id/youtube/ytmp3?url=${encodeURIComponent(ytUrl)}`;
         const res = await fetch(apiUrl);
         const data = await res.json();
 
@@ -128,7 +128,7 @@ cmd({
         }, { quoted: mek });
 
         // Step 3: Fetch audio URL
-        const apiUrl = `https://api-aswin-sparky.koyeb.app/api/downloader/song?search=${encodeURIComponent(vid.url)}`;
+        const apiUrl = `https://apis.davidcyriltech.my.id/youtube/mp3?search=${encodeURIComponent(vid.url)}`;
         const response = await fetch(apiUrl);
         const data = await response.json();
 
@@ -236,7 +236,7 @@ cmd({
 
                     try {
                         // Get fresh download URL for each request
-                        const apiResponse = await fetch(`https://jawad-tech.vercel.app/download/ytmp4?url=${encodeURIComponent(yts.url)}`);
+                        const apiResponse = await fetch(`https://apis.davidcyriltech.my.id/youtube/mp4?url=${encodeURIComponent(yts.url)}`);
                         const apiData = await apiResponse.json();
                         
                         if (!apiData.status || !apiData.result.download) {
