@@ -14,11 +14,57 @@ const { exec } = require('child_process');
 const axios = require('axios');
 const FormData = require('form-data');
 
-
-
 let antibotAction = "off"; // Default action is off
 let warnings = {}; // Store warning counts per user
 
+
+cmd({
+    pattern: "welcome",
+    alias: ["setwelcome"],
+    react: "✅",
+    desc: "Enable or disable welcome messages for new members",
+    category: "settings",
+    filename: __filename
+},
+async (conn, mek, m, { from, args, isCreator, reply }) => {
+    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+
+    const status = args[0]?.toLowerCase();
+    if (status === "on") {
+        config.WELCOME = "true";
+        return reply("✅ ᴡᴇʟᴄᴏᴍᴇ ᴍᴇssᴀɢᴇs ᴀʀᴇ ɴᴏᴡ ᴇɴᴀʙʟᴇᴅ.");
+    } else if (status === "off") {
+        config.WELCOME = "false";
+        return reply("❌ ᴡᴇʟᴄᴏᴍᴇ ᴍᴇssᴀɢᴇs ᴀʀᴇ ɴᴏᴡ ᴅɪsᴀʙʟᴇᴅ.");
+    } else {
+        return reply(`ᴇxᴀᴍᴘʟᴇ: .ᴡᴇʟᴄᴏᴍᴇ ᴏɴ`);
+    }
+});
+
+
+// WELCOME
+cmd({
+    pattern: "goodbye",
+    alias: ["setgoodbye"],
+    react: "✅",
+    desc: "Enable or disable welcome messages for new members",
+    category: "settings",
+    filename: __filename
+},
+async (conn, mek, m, { from, args, isCreator, reply }) => {
+    if (!isCreator) return reply("*📛 ᴏɴʟʏ ᴛʜᴇ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ!*");
+
+    const status = args[0]?.toLowerCase();
+    if (status === "on") {
+        config.GOODBYE = "true";
+        return reply("✅ ɢᴏᴏᴅʙʏᴇ ᴍᴇssᴀɢᴇs ᴀʀᴇ ɴᴏᴡ ᴇɴᴀʙʟᴇᴅ.");
+    } else if (status === "off") {
+        config.GOODBYE = "false";
+        return reply("❌ ɢᴏᴏᴅʙʏᴇ ᴍᴇssᴀɢᴇs ᴀʀᴇ ɴᴏᴡ ᴅɪsᴀʙʟᴇᴅ.");
+    } else {
+        return reply(`ᴇxᴀᴍᴘʟᴇ: .ᴡᴇʟᴄᴏᴍᴇ ᴏɴ`);
+    }
+});
 
 cmd({
     pattern: "antibot",
