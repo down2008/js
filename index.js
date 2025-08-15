@@ -35,7 +35,6 @@ const {
   const StickersTypes = require('wa-sticker-formatter')
   const util = require('util')
   const { sms, downloadMediaMessage, AntiDelete } = require('./lib')
-  const { registerGroupMessages } = require('./plugins/groupMessages')
   const FileType = require('file-type');
   const { File } = require('megajs');
   const axios = require('axios')
@@ -375,11 +374,10 @@ conn.ev.on('messages.upsert', async (msg) => {
   });
 //=========WELCOME & GOODBYE =======
 	
-registerGroupMessages(conn);
+conn.ev.on("group-participants.update", (update) => GroupEvents(conn, update));	 
 
 setupLinkDetection(conn);
-
-
+	
  /// READ STATUS       
   conn.ev.on('messages.upsert', async(mek) => {
     mek = mek.messages[0]
