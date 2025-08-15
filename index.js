@@ -189,26 +189,9 @@ conn.ev.on('connection.update', async (update) => {
 
     try {
 		
+
 const botname = "MEGALODON"; // Bot name
 const ownername = "SUPPORT"; // Owner name
-
-const ali = { 
-    key: { 
-        remoteJid: 'status@broadcast', 
-        participant: '0@s.whatsapp.net' 
-    }, 
-    message: { 
-        newsletterAdminInviteMessage: { 
-            newsletterJid: '120363401051937059@newsletter', // Your channel JID
-            newsletterName: "𝐈𝐂𝐘 𝐁𝐎𝐓", // Newsletter name
-            caption: `${botname} 𝐌Ɗ ${ownername}`, 
-            inviteExpiration: 0
-        }
-    }
-};
-
-const username = `DybyTech`;
-const mrfrank = `https://github.com/${username}`;
 
 const upMessage = `> *╭────────────────────◇*
 > *│•* *➺ ᴍᴇɢᴀʟᴏᴅᴏɴ ᴍᴅ ᴄᴏɴɴᴇᴄᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʏ ᴛʏᴘᴇ*
@@ -222,14 +205,10 @@ const upMessage = `> *╭──────────────────�
 > ╰────────────────────○
 > *ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*`;
 
-await conn.sendMessage(
-    conn.user.id, 
-    { 
-        image: { url: CONFIG.MENU_IMAGE_URL }, 
-        caption: upMessage
-    },
-    { quoted: ali }
-);
+await conn.sendMessage(conn.user.id, { 
+    image: { url: CONFIG.MENU_IMAGE_URL }, 
+    caption: upMessage
+});
 		
 
                     
