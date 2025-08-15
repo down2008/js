@@ -27,12 +27,11 @@ PREFIX: prosess.env.PREFIX || ".",
 // add your prifix for bot   
 OWNER_NAME: prosess.env.OWNER_NAME || "ᴅʏʙʏ ᴛᴇᴄʜ",
 // add bot owner name
-CHATBOT: getConfig("CHATBOT") || "on", 
-//chatbot on/off
 BOT_NAME: process.env.BOT_NAME || "MEGALODON-MD",
 // add bot namw here for menu
 STICKER_NAME: process.env.STICKER_NAME || "MEGALODON-MD",
-    
+WELCOME: process.env.WELCOME || "true",
+GOODBYE: process.env.GOODBYE || "true",
 // type sticker pack name 
 CUSTOM_REACT: process.env.CUSTOM_REACT || "false",
 // make this true for custum emoji react    
