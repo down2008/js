@@ -22,11 +22,11 @@ WELCOME: process.env.WELCOME || "true",
 // true if want welcome and goodbye msg in groups    
 ADMIN_EVENTS: process.env.ADMIN_EVENTS || "false",
 // make true to know who dismiss or promoted a member in group
-MENU_IMAGE_URL: getConfig("MENU_IMAGE_URL") || "https://files.catbox.moe/2ozipw.jpg" ,
+MENU_IMAGE_URL: prosess.env.MENU_IMAGE_URL || "https://files.catbox.moe/2ozipw.jpg" ,
 // add custom menu and mention reply image url
-PREFIX: getConfig("PREFIX") || ".", 
+PREFIX: prosess.env.PREFIX || ".", 
 // add your prifix for bot   
-OWNER_NAME: getConfig("OWNER_NAME") || "ᴅʏʙʏ ᴛᴇᴄʜ",
+OWNER_NAME: prosess.env.OWNER_NAME || "ᴅʏʙʏ ᴛᴇᴄʜ",
 // add bot owner name
 CHATBOT: getConfig("CHATBOT") || "on", 
 //chatbot on/off
