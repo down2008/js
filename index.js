@@ -206,7 +206,7 @@ const upMessage = `> *╭──────────────────�
 > *ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*`;
 
 await conn.sendMessage(conn.user.id, { 
-    image: { url: CONFIG.MENU_IMAGE_URL }, 
+    image: { url: `https://files.catbox.moe/w1l8b0.jpg` }, 
     caption: upMessage
 });
 		
