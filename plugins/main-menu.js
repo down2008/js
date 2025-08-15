@@ -42,7 +42,7 @@ cmd({
   use: '.menu',
   desc: "Show all bot commands",
   category: "menu",
-  react: "🎴",
+  react: "💫",
   filename: __filename
 },
 async (conn, mek, m, { from, reply }) => {
@@ -63,14 +63,14 @@ async (conn, mek, m, { from, reply }) => {
     const time = moment().tz(config.TIME_ZONE || 'UTC').format('HH:mm:ss');
     const date = moment().tz(config.TIME_ZONE || 'UTC').format('DD/MM/YYYY');
 
-    let menuText = `*╭══〘〘 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃* 〙〙═⊷
-┃❍ *ᴜsᴇʀ* : @${sender.split("@")[0]}
-┃❍ *ᴘʟᴜɢɪɴs* : ${commands.length}
-┃❍ *ᴅᴀᴛᴇ ᴛᴏᴅᴀʏ* : ${date}
-┃❍ ᴘʀᴇғɪx : [ ${config.PREFIX} ]
-┃❍ *ᴍᴏᴅᴇ* : 『 ${config.MODE} 』
-┃❍ *ᴠᴇʀsɪᴏɴ* : ${version}
-┃❍ *ᴄʀᴇᴀᴛᴏʀ* : ᴅʏʙʏ ᴛᴇᴄʜ 
+    let menuText = `╭══〘〘 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 〙〙═⊷
+┃⬡ *ᴜsᴇʀ* : @${sender.split("@")[0]}
+┃⬡ *ᴘʟᴜɢɪɴs* : ${commands.length}
+┃⬡ *ᴅᴀᴛᴇ ᴛᴏᴅᴀʏ* : ${date}
+┃⬡ ᴘʀᴇғɪx : [ ${config.PREFIX} ]
+┃⬡ *ᴍᴏᴅᴇ* : 『 ${config.MODE} 』
+┃⬡ *ᴠᴇʀsɪᴏɴ* : ${version}
+┃⬡ *ᴄʀᴇᴀᴛᴏʀ* : ᴅʏʙʏ ᴛᴇᴄʜ 
 ╰═════════════════⊷`;
 
 
@@ -83,13 +83,13 @@ async (conn, mek, m, { from, reply }) => {
 
     const keys = Object.keys(category).sort();
     for (let k of keys) {
-      menuText += `\n┌── 『 *${k.toUpperCase()} MENU* 』`;
+      menuText += `\n*┌──* 『 *`${k.toUpperCase()} MENU`* 』`;
       const cmds = category[k].filter(c => c.pattern).sort((a, b) => a.pattern.localeCompare(b.pattern));
       cmds.forEach((cmd) => {
         const usage = cmd.pattern.split('|')[0];
-        menuText += `\n*┋⁠➳* ${config.PREFIX}${toSmallCaps(usage)}`;
+        menuText += `\n*│* ${config.PREFIX}${toSmallCaps(usage)}`;
       });
-      menuText += `\n╰───────────────❃`;
+      menuText += `\n*╰───────────────❃*`;
     }
 
     const selectedStyle = menuText;
