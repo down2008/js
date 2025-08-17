@@ -47,7 +47,7 @@ const {
   const mode = config.MODE 
   const https = require('https');
   
-  const ownerNumber = ['50948702213']
+  const ownerNumber = ["50948702213"]
   //=============================================
     const tempDir = path.join(os.tmpdir(), 'cache-temp')
   if (!fs.existsSync(tempDir)) {
