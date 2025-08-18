@@ -43,6 +43,7 @@ const {
   const Crypto = require('crypto')
   const path = require('path')
   const prefix = config.PREFIX
+  const mode = config.MODE 
   
   const ownerNumber = ['50948702213']
     //=============================================
