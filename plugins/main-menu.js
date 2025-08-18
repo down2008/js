@@ -4,6 +4,7 @@ const { cmd, commands } = require('../command');
 const axios = require('axios');
 const more = String.fromCharCode(8206);
 const readMore = more.repeat(4001);
+const ownername = config.OWNER_NAME 
 const smallCaps = {
   "A": "ᴀ",
   "B": "ʙ",
@@ -62,12 +63,12 @@ async (conn, mek, m, { from, reply }) => {
     };
     const uptimeStr = uptime();
     const time = moment().tz(config.TIME_ZONE || 'UTC').format('HH:mm:ss');
-    const date = moment().tz(config.TIME_ZONE || 'UTC').format('DD/MM/YYYY');
+    
 
     let menuText = `╭══〘〘 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 〙〙═⊷
 ┃⬡ ᴜsᴇʀ : @${sender.split("@")[0]}
 ┃⬡ ᴘʟᴜɢɪɴs : ${commands.length}
-┃⬡ ᴅᴀᴛᴇ ᴛᴏᴅᴀʏ* : ${date}
+┃⬡ ᴏᴡɴᴇʀ : ${ownername}
 ┃⬡ ᴘʀᴇғɪx : [ ${config.PREFIX} ]
 ┃⬡ ᴍᴏᴅᴇ : 『 ${config.MODE} 』
 ┃⬡ ᴠᴇʀsɪᴏɴ : ${version}
@@ -91,7 +92,7 @@ ${readMore}`;
         const usage = cmd.pattern.split('|')[0];
         menuText += `\n*│* ${config.PREFIX}${toSmallCaps(usage)}`;
       });
-      menuText += `\n*╰───────────────❃*`;
+      menuText += `\n*╰─────────────────❃*`;
     }
 
     const selectedStyle = menuText;
