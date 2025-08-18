@@ -47,7 +47,7 @@ cmd({
       release_date
     } = music;
 
-    const songInfo = `👋 Hi @${m.sender.split("@")[0]}, ʜᴇʀᴇ ɪs ʏᴏᴜʀ ᴍᴜsɪᴄ ɪɴғᴏ:
+    const songInfo = `👋 ʜɪ @${m.sender.split("@")[0]}, ʜᴇʀᴇ ɪs ʏᴏᴜʀ ᴍᴜsɪᴄ ɪɴғᴏ:
 
 • 📌 *𝐓𝐈𝐓𝐋𝐄:* ${title}
 • 👨‍🎤 *𝐀𝐑𝐓𝐈𝐒𝐓:* ${artists?.map(v => v.name).join(', ') || 'NOT FOUND'}
@@ -76,7 +76,7 @@ cmd({
           newsletterJid: "120363401051937059@newsletter"
         },
         externalAdReply: {
-          title: "🎧 Music Finder Result",
+          title: "🎧 ᴍᴜsɪᴄ ғɪɴᴅᴇʀ ʀᴇsᴜʟᴛ",
           body: "ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ",
           thumbnailUrl: userPic,
           mediaType: 1,
