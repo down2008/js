@@ -5,7 +5,7 @@ const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, 
 cmd({
     pattern: "tagadmins",
     react: "👑",
-    alias: ["gc_tagadmins"],
+    alias: ["tagadmin","tagadm","tagadms"],
     desc: "To Tag all Admins of the Group",
     category: "group",
     use: '.tagadmins [message]',
@@ -34,7 +34,7 @@ async (conn, mek, m, { from, participants, reply, isGroup, senderNumber, groupAd
         let message = body.slice(body.indexOf(command) + command.length).trim();
         if (!message) message = "ᴀᴛᴛᴇɴᴛɪᴏɴ ᴀᴅᴍɪɴs"; // Default message
 
-        let teks = `▢ Group : *${groupName}*\n▢ Admins : *${totalAdmins}*\n▢ Message: *${message}*\n\n┌───⊷ *ADMIN MENTIONS*\n`;
+        let teks = `▢ ɢʀᴏᴜᴘ : *${groupName}*\n▢ ᴀᴅᴍɪɴs : *${totalAdmins}*\n▢ ᴍᴇssᴀɢᴇ: *${message}*\n\n┌───⊷ *𝐀𝐃𝐌𝐈𝐍 𝐌𝐄𝐍𝐓𝐈𝐎𝐍𝐒*\n`;
 
         for (let admin of admins) {
             if (!admin) continue; // Prevent undefined errors
