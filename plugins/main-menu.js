@@ -65,7 +65,7 @@ async (conn, mek, m, { from, reply }) => {
     const time = moment().tz(config.TIME_ZONE || 'UTC').format('HH:mm:ss');
     
 
-    let menuText = `╭══〘〘 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 〙〙═⊷
+    let menuText = `╭──〘〘 \`𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃\` 〙〙─⟢
 ┃⬡ ᴜsᴇʀ : @${sender.split("@")[0]}
 ┃⬡ ᴘʟᴜɢɪɴs : ${commands.length}
 ┃⬡ ᴏᴡɴᴇʀ : ${ownername}
@@ -73,7 +73,7 @@ async (conn, mek, m, { from, reply }) => {
 ┃⬡ ᴍᴏᴅᴇ : 『 ${config.MODE} 』
 ┃⬡ ᴠᴇʀsɪᴏɴ : ${version}
 ┃⬡ ᴄʀᴇᴀᴛᴏʀ : ᴅʏʙʏ ᴛᴇᴄʜ 
-╰═════════════════⊷
+╰─────────────────⟢
 ${readMore}`;
 
 
@@ -92,7 +92,7 @@ ${readMore}`;
         const usage = cmd.pattern.split('|')[0];
         menuText += `\n*│* ${config.PREFIX}${toSmallCaps(usage)}`;
       });
-      menuText += `\n*╰─────────────────❃*`;
+      menuText += `\n*╰─────────────────◈*`;
     }
 
     const selectedStyle = menuText;
