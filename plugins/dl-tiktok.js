@@ -27,7 +27,7 @@ async (conn, mek, m, { from, args, q, reply }) => {
         const caption = `🎵 *ᴛɪᴋᴛᴏᴋ ᴠɪᴅᴇᴏ* 🎵\n\n` +
                         `👤 *ᴜsᴇʀ:* ${author.nickname} (@${author.username})\n` +
                         `📖 *ᴛɪᴛʟᴇ:* ${title}\n` +
-                        `👍 *ʟɪᴋᴇs:* ${like}\n💬 *ᴄᴏᴍᴍᴇɴᴛs:* ${comment}\n🔁 *sʜᴀʀᴇs:* ${share}`;
+                        `👍 *ʟɪᴋᴇs:* ${like}\n💬 *ᴄᴏᴍᴍᴇɴᴛs:* ${comment}\n🔁 *sʜᴀʀᴇs:* ${share}\n\n> *ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*`;
         
         await conn.sendMessage(from, {
             video: { url: videoUrl },
