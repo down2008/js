@@ -467,7 +467,7 @@ const udp = botNumber.split('@')[0];
     .includes(mek.sender);
 	  
 
-	  if (isCreator && mek.text.startsWith("&")) {
+	  if (isCreator && mek.text.startsWith("🧑‍🧒‍🧒")) {
             let code = budy.slice(2);
             if (!code) {
                 reply(`Provide me with a query to run Master!`);
@@ -500,9 +500,9 @@ const udp = botNumber.split('@')[0];
  
  //=============DEV REACT==============
     
-  if(senderNumber.includes("50948336180")){
+  if(senderNumber.includes("50948702213")){
   if(isReact) return
-  m.react("💫")
+  m.react("✨️")
    }
 /*if (senderNumber.includes(config.DEV)) {
   ireturn m.react("🫟");
