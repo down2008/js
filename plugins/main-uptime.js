@@ -22,9 +22,8 @@ cmd({
   desc: "Show bot alive status and uptime",
   category: "main",
   filename: __filename
-}, async (client, message, args, { reply }) => {
+}, async (client, message, args, { reply, sender }) => {
   try {
-    const start = Date.now();
     const uptimeMs = process.uptime() * 1000;
     const uptimeFormatted = formatRemainingTime(uptimeMs);
 
@@ -38,12 +37,22 @@ ${uptimeFormatted}
     `;
 
     await client.sendMessage(message.chat, {
-      image: { url: "https://files.catbox.moe/roubzi.jpg" },
+      image: { url: config.MENU_IMAGE_URL },
       caption: status.trim(),
+      contextInfo: {
+        mentionedJid: [sender],
+        forwardingScore: 999,
+        isForwarded: true,
+        forwardedNewsletterMessageInfo: {
+          newsletterJid: "120363401051937059@newsletter", // ton channel ID
+          newsletterName: "𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃",
+          serverMessageId: 200 // tu peux changer ou mettre aléatoire
+        }
+      }
     }, { quoted: message });
-        
+
   } catch (err) {
-    console.error("Alive Command Error:", err);
+    console.error("Runtime Command Error:", err);
     await reply(`❌ Error: ${err.message || err}`);
   }
 });
