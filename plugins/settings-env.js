@@ -23,7 +23,7 @@ cmd({
     alias: ["setwelcome"],
     react: "✅",
     desc: "Enable or disable welcome messages for new members",
-    category: "settings",
+    category: "group",
     filename: __filename
 },
 async (conn, mek, m, { from, args, isCreator, reply }) => {
@@ -48,7 +48,7 @@ cmd({
     alias: ["setgoodbye"],
     react: "✅",
     desc: "Enable or disable welcome messages for new members",
-    category: "settings",
+    category: "group",
     filename: __filename
 },
 async (conn, mek, m, { from, args, isCreator, reply }) => {
