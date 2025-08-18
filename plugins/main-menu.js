@@ -2,7 +2,8 @@ const config = require('../config');
 const moment = require('moment-timezone');
 const { cmd, commands } = require('../command');
 const axios = require('axios');
-
+const more = String.fromCharCode(8206);
+const readMore = more.repeat(4001);
 const smallCaps = {
   "A": "ᴀ",
   "B": "ʙ",
@@ -50,7 +51,7 @@ async (conn, mek, m, { from, reply }) => {
        const sender = m?.sender || mek?.key?.participant || mek?.key?.remoteJid || 'unknown@s.whatsapp.net';
     const username = m.pushName || 'User';
     const version = config.VERSION || '2.0.0';
-
+    await conn.sendPresenceUpdate('composing', from);
     // Infos temps
     const uptime = () => {
       let sec = process.uptime();
@@ -64,14 +65,15 @@ async (conn, mek, m, { from, reply }) => {
     const date = moment().tz(config.TIME_ZONE || 'UTC').format('DD/MM/YYYY');
 
     let menuText = `╭══〘〘 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 〙〙═⊷
-┃⬡ *ᴜsᴇʀ* : @${sender.split("@")[0]}
-┃⬡ *ᴘʟᴜɢɪɴs* : ${commands.length}
-┃⬡ *ᴅᴀᴛᴇ ᴛᴏᴅᴀʏ* : ${date}
+┃⬡ ᴜsᴇʀ : @${sender.split("@")[0]}
+┃⬡ ᴘʟᴜɢɪɴs : ${commands.length}
+┃⬡ ᴅᴀᴛᴇ ᴛᴏᴅᴀʏ* : ${date}
 ┃⬡ ᴘʀᴇғɪx : [ ${config.PREFIX} ]
-┃⬡ *ᴍᴏᴅᴇ* : 『 ${config.MODE} 』
-┃⬡ *ᴠᴇʀsɪᴏɴ* : ${version}
-┃⬡ *ᴄʀᴇᴀᴛᴏʀ* : ᴅʏʙʏ ᴛᴇᴄʜ 
-╰═════════════════⊷`;
+┃⬡ ᴍᴏᴅᴇ : 『 ${config.MODE} 』
+┃⬡ ᴠᴇʀsɪᴏɴ : ${version}
+┃⬡ ᴄʀᴇᴀᴛᴏʀ : ᴅʏʙʏ ᴛᴇᴄʜ 
+╰═════════════════⊷
+${readMore}`;
 
 
     let category = {};
@@ -108,7 +110,9 @@ async (conn, mek, m, { from, reply }) => {
         }
       }
     }, { quoted: mek });
-
+    
+   await conn.sendPresenceUpdate('paused', from);
+        
   } catch (e) {
     console.error(e);
     reply(`❌ Error: ${e.message}`);
