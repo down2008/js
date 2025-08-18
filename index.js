@@ -222,7 +222,7 @@ const upMessage = `*╭───────────────────
 await conn.sendMessage(
     conn.user.id, 
     { 
-        image: { url: CONFIG.MENU_IMAGE_URL }, 
+        image: { url: config.MENU_IMAGE_URL }, 
         caption: upMessage
     },
     { quoted: ali }
