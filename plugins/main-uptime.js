@@ -4,7 +4,7 @@ const os = require("os");
 const path = require("path");
 const FormData = require("form-data");
 const { cmd } = require("../command");
-const { config } = require("../config");
+const config = require('../config');
 
 function formatRemainingTime(ms) {
   let totalSeconds = Math.floor(ms / 1000);
