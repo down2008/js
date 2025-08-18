@@ -6,9 +6,6 @@ const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, sleep, fetchJson
 const { writeFileSync } = require('fs');
 const path = require('path');
 
-let antilinkAction = "off"; // Default state
-let warnCount = {}; // Track warnings per user
-
 const os = require('os');
 const { exec } = require('child_process');
 const axios = require('axios');
@@ -66,6 +63,8 @@ async (conn, mek, m, { from, args, isCreator, reply }) => {
     }
 });
 
+
+// ====== Commande .antibot ======
 cmd({
     pattern: "antibot",
     react: "🫟",
@@ -79,43 +78,55 @@ cmd({
     if (!isAdmins && !isOwner) return reply("⛔ ᴏɴʟʏ ᴀᴅᴍɪɴs ᴏʀ ᴏᴡɴᴇʀ ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ.");
 
     if (!q) {
-        return reply(`*📛 ᴄᴜʀʀᴇɴᴛ ᴀɴᴛɪʙᴏᴛ ᴀᴄᴛɪᴏɴ:* ${antibotAction.toUpperCase()}\n\n*🧪 Usage:* .antibot off / warn / delete / kick`);
+        return reply(`*📛 ᴄᴜʀʀᴇɴᴛ ᴀɴᴛɪʙᴏᴛ ᴀᴄᴛɪᴏɴ:* ${antibotAction.toUpperCase()}\n\n*🧪 ᴜsᴀɢᴇ:* .ᴀɴᴛɪʙᴏᴛ ᴏғғ / ᴡᴀʀɴ / ᴅᴇʟᴇᴛᴇ / ᴋɪᴄᴋ`);
     }
 
     const action = q.toLowerCase();
     if (["off", "warn", "delete", "kick"].includes(action)) {
         antibotAction = action;
-        return reply(`✅ *ᴀɴᴛɪʙᴏᴛ ᴀᴄᴛɪᴏɴ sᴇᴛ ᴛᴏ:* ${action.toUpperCase()}`);
+        return reply(`✅ ᴀɴᴛɪʙᴏᴛ ᴀᴄᴛɪᴏɴ sᴇᴛ ᴛᴏ: ${action.toUpperCase()}`);
     } else {
-        return reply("❌ *Invalid action.*\n\n*🫟 ᴇxᴀᴍᴘʟᴇ:* .ᴀɴᴛɪʙᴏᴛ ᴏɴ / ᴡᴀʀɴ / ᴅᴇʟᴇᴛᴇ / ᴋɪᴄᴋ");
+        return reply("❌ ɪɴᴠᴀʟɪᴅ ᴀᴄᴛɪᴏɴ.\n\n*🫟 ᴇxᴀᴍᴘʟᴇ:* .ᴀɴᴛɪʙᴏᴛ ᴏғғ / ᴡᴀʀɴ / ᴅᴇʟᴇᴛᴇ / ᴋɪᴄᴋ");
     }
 });
 
-// Détection de messages suspects (bots joints au groupe)
+// ====== Détection et action contre les bots ======
 cmd({
     on: "body"
 }, async (conn, mek, m, { from, isGroup, sender, isBotAdmins, isAdmins, reply }) => {
     if (!isGroup || antibotAction === "off") return;
 
     const messageId = mek?.key?.id || "";
-    if (!messageId.startsWith("31F")) return; // messages typiques des bots (ajustable selon tes besoins)
+    if (!messageId.startsWith("31F")) return; // ajustable selon les bots à détecter
 
-    if (!isBotAdmins) return reply("*❌ ɪ'ᴍ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ, sᴏ ɪ ᴄᴀɴ'ᴛ ᴛᴀᴋᴇ ᴀᴄᴛɪᴏɴ!*");
-    if (isAdmins) return; // Ignore les admins
+    if (!isBotAdmins) return reply("*❌ ɪ’ᴍ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ, ᴄᴀɴɴᴏᴛ ᴛᴀᴋᴇ ᴀᴄᴛɪᴏɴ!*");
+    if (isAdmins) return; // Ignore les admins du groupe
 
     // Supprimer le message
-    await conn.sendMessage(from, { delete: mek.key });
+    try {
+        await conn.sendMessage(from, { delete: mek.key });
+    } catch (e) {
+        console.log("Cannot delete message:", e.message);
+    }
 
     switch (antibotAction) {
         case "kick":
-            await conn.groupParticipantsUpdate(from, [sender], "remove");
+            try {
+                await conn.groupParticipantsUpdate(from, [sender], "remove");
+            } catch (e) {
+                console.log("Cannot kick user:", e.message);
+            }
             break;
 
         case "warn":
             warnings[sender] = (warnings[sender] || 0) + 1;
             if (warnings[sender] >= 3) {
                 delete warnings[sender];
-                await conn.groupParticipantsUpdate(from, [sender], "remove");
+                try {
+                    await conn.groupParticipantsUpdate(from, [sender], "remove");
+                } catch (e) {
+                    console.log("Cannot kick user after 3 warnings:", e.message);
+                }
             } else {
                 return reply(`⚠️ @${sender.split("@")[0]}, ᴡᴀʀɴɪɴɢ ${warnings[sender]}/3! ʙᴏᴛs ᴀʀᴇ ɴᴏᴛ ᴀʟʟᴏᴡᴇᴅ!`, {
                     mentions: [sender]
@@ -124,7 +135,10 @@ cmd({
             break;
 
         case "delete":
-            // Message déjà supprimé, pas besoin d'autre action
+            // Message déjà supprimé, pas besoin d’autre action
             break;
     }
 });
+
+// ====== Optionnel : Reset automatique des warnings toutes les 24h ======
+setInterval(() => { warnings = {}; }, 24 * 60 * 60 * 1000);
