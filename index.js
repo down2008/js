@@ -40,7 +40,6 @@ const {
   const { fromBuffer } = require('file-type')
   const bodyparser = require('body-parser')
   const os = require('os')
-  const chalk = require("chalk");
   const Crypto = require('crypto')
   const path = require('path')
   const prefix = config.PREFIX
@@ -516,32 +515,21 @@ if (!isReact && senderNumber === botNumber) {
 } 
         
       
-  const bannedUsers = JSON.parse(fsSync.readFileSync("./lib/ban.json", "utf-8"));
-      const isBanned = bannedUsers.includes(sender);
-      if (isBanned) {
-        console.log(chalk.red(`[ 🚫 ] Ignored command from banned user: ${sender}`));
-        return;
-      }
+  const bannedUsers = JSON.parse(fs.readFileSync('./lib/ban.json', 'utf-8'));
+const isBanned = bannedUsers.includes(sender);
 
-      // Owner check
-      const ownerFile = JSON.parse(fsSync.readFileSync("./lib/sudo.json", "utf-8"));
-      const ownerNumberFormatted = `${config.OWNER_NUMBER}@s.whatsapp.net`;
-      const isFileOwner = ownerFile.includes(sender);
-      const isRealOwner = sender === ownerNumberFormatted || isMe || isFileOwner;
-
-      // Mode restrictions
-      if (!isRealOwner && config.MODE === "private") {
-        console.log(chalk.red(`[ 🚫 ] Ignored command in private mode from ${sender}`));
-        return;
-      }
-      if (!isRealOwner && isGroup && config.MODE === "inbox") {
-        console.log(chalk.red(`[ 🚫 ] Ignored command in group ${groupName} from ${sender} in inbox mode`));
-        return;
-      }
-      if (!isRealOwner && !isGroup && config.MODE === "groups") {
-        console.log(chalk.red(`[ 🚫 ] Ignored command in private chat from ${sender} in groups mode`));
-        return;
-      }
+if (isBanned) return; // Ignore banned users completely
+	  
+  const ownerFile = JSON.parse(fs.readFileSync('./lib/sudo.json', 'utf-8'));  // خواندن فایل
+  const ownerNumberFormatted = `${config.OWNER_NUMBER}@s.whatsapp.net`;
+  // بررسی اینکه آیا فرستنده در owner.json موجود است
+  const isFileOwner = ownerFile.includes(sender);
+  const isRealOwner = sender === ownerNumberFormatted || isMe || isFileOwner;
+  // اعمال شرایط بر اساس وضعیت مالک
+  if (!isRealOwner && config.MODE === "private") return;
+  if (!isRealOwner && isGroup && config.MODE === "inbox") return;
+  if (!isRealOwner && !isGroup && config.MODE === "groups") return;
+ 
 	  
  
 	  
@@ -1026,7 +1014,7 @@ app.get("/", (req, res) => {
   res.redirect("/dyby.html");
 });
 app.listen(port, () =>
-  console.log(chalk.cyan(`MEGALODON-MD RUNNING 🙂💫`))
+  console.log(`MEGALODON-MD RUNNING 🙂💫`)
 );
 
 setTimeout(() => {
