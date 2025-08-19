@@ -85,15 +85,15 @@ if (!fs.existsSync(sessionDir)) {
 async function loadSession() {
     try {
         if (!config.SESSION_ID) {
-            console.log('No SESSION_ID provided please put one!');
+            console.log(chalk.red("No SESSION_ID provided please put one!"));
             return null;
         }
 
       
-        console.log('Downloading session data...');
+        console.log(chalk.green("Downloading session data..."));
 
         if (config.SESSION_ID.startsWith('MEGALODON~MD**')) {
-            console.log('Downloading Xcall session...');
+            console.log(chalk.grenn("Downloading Xcall session..."));
             const sessdata = config.SESSION_ID.replace("MEGALODON~MD**", '');
             const response = await axios.get(`https://dave-auth-manager.onrender.com/files/${sessdata}.json`,
             );
@@ -103,12 +103,12 @@ async function loadSession() {
             }
 
             fs.writeFileSync(credsPath, JSON.stringify(response.data), 'utf8');
-            console.log('Xcall session downloaded successfully');
+            console.log(chalk.cyan("Xcall session downloaded successfully"));
             return response.data;
         } 
         // Otherwise try MEGA.nz download
         else {
-            console.log('Downloading MEGAsd session...');
+            console.log(chalk.cyan("Downloading MEGA session..."));
             
 const megaFileId = config.SESSION_ID.startsWith('MEGALODON~MD~') 
     ? config.SESSION_ID.replace("MEGALODON~MD~", "") 
@@ -124,12 +124,12 @@ const filer = File.fromURL(`https://mega.nz/file/${megaFileId}`);
             });
             
             fs.writeFileSync(credsPath, data);
-            console.log('MEGA session downloaded successfully');
+            console.log(chalk.grenn("MEGA session downloaded successfully"));
             return JSON.parse(data.toString());
         }
     } catch (error) {
-        console.error('❌ Error loading session:', error.message);
-        console.log('Will generate QR code instead');
+        console.error(chalk.red("❌ Error loading session:", error.message);
+        console.log(chalk.red("Will generate QR code instead"));
         return null;
     }
 }
@@ -137,7 +137,7 @@ const filer = File.fromURL(`https://mega.nz/file/${megaFileId}`);
 //=========SESSION-AUTH====================
 
 async function connectToWA() {
-    console.log("Connecting to WhatsApp ⏳️...");
+    console.log(chalk.cyan("[ 🟠 ] Connecting to WhatsApp ⏳️..."));
     
     const creds = await loadSession();
     
@@ -167,14 +167,15 @@ conn.ev.on('connection.update', async (update) => {
 
   if (connection === 'close') {
     if (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut) {
-      console.log('Connection lost, reconnecting...');
+      console.log(chalk.red("[ 🛑 ] Connection closed, please change session ID or re-authenticate"));
       setTimeout(connectToWA, 5000);
     } else {
-      console.log('Connection closed, please change session ID');
+      console.log(chalk.red("[ ⏳️ ] Connection lost, reconnecting..."));
     }
   } else if (connection === 'open' && !startupSent) {
     startupSent = true;
-    console.log('✅ MEGALODON-MD Connected Successfully');
+    console.log(chalk.green("[ 🤖 ] Megalodon Connected ✅"));
+
 
 	              // Load plugins
             const pluginPath = path.join(__dirname, 'plugins');
@@ -183,7 +184,7 @@ conn.ev.on('connection.update', async (update) => {
                     require(path.join(pluginPath, plugin));
                 }
             });
-            console.log('Plugins installed successfully ✅');
+            console.log(chalk.green("[ ✅ ] Plugins loaded successfully"));
 
     try {
 		
@@ -226,18 +227,18 @@ await conn.sendMessage(
         image: { url: config.MENU_IMAGE_URL }, 
         caption: upMessage
     },
-    { quoted: ali }
-);
-		
+    { quoted: ali });
+console.log(chalk.green("[ 📩 ] Connection notice sent successfully with image"));
+
 
                     
                 } catch (sendError) {
-                    console.error('[❄️] Error sending messages:', sendError);
+                    console.error(chalk.red("[❄️] Error sending messages:", sendError));
                 }
             }
 
         if (qr) {
-            console.log('[❄️] Scan the QR code to connect or use session ID');
+            console.log(chalk.red("[❄️] Scan the QR code to connect or use session ID"));
         }
     });
 
@@ -556,15 +557,32 @@ if (!isReact && senderNumber === botNumber) {
 } 
         
       
-  const ownerFile = JSON.parse(fs.readFileSync('./lib/sudo.json', 'utf-8'));  // DybyTech 
-  const ownerNumberFormatted = `${config.OWNER_NUMBER}@s.whatsapp.net`;
-  // json file setup
-  const isFileOwner = ownerFile.includes(sender);
-  const isRealOwner = sender === ownerNumberFormatted || isMe || isFileOwner;
-  // mode settings 
-  if (!isRealOwner && config.MODE === "private") return;
-  if (!isRealOwner && isGroup && config.MODE === "inbox") return;
-  if (!isRealOwner && !isGroup && config.MODE === "groups") return;
+  const bannedUsers = JSON.parse(fsSync.readFileSync("./lib/ban.json", "utf-8"));
+      const isBanned = bannedUsers.includes(sender);
+      if (isBanned) {
+        console.log(chalk.red(`[ 🚫 ] Ignored command from banned user: ${sender}`));
+        return;
+      }
+
+      // Owner check
+      const ownerFile = JSON.parse(fsSync.readFileSync("./lib/sudo.json", "utf-8"));
+      const ownerNumberFormatted = `${config.OWNER_NUMBER}@s.whatsapp.net`;
+      const isFileOwner = ownerFile.includes(sender);
+      const isRealOwner = sender === ownerNumberFormatted || isMe || isFileOwner;
+
+      // Mode restrictions
+      if (!isRealOwner && config.MODE === "private") {
+        console.log(chalk.red(`[ 🚫 ] Ignored command in private mode from ${sender}`));
+        return;
+      }
+      if (!isRealOwner && isGroup && config.MODE === "inbox") {
+        console.log(chalk.red(`[ 🚫 ] Ignored command in group ${groupName} from ${sender} in inbox mode`));
+        return;
+      }
+      if (!isRealOwner && !isGroup && config.MODE === "groups") {
+        console.log(chalk.red(`[ 🚫 ] Ignored command in private chat from ${sender} in groups mode`));
+        return;
+      }
 	  
  
 	  
@@ -1049,13 +1067,7 @@ app.get("/", (req, res) => {
   res.redirect("/dyby.html");
 });
 app.listen(port, () =>
-  console.log(chalk.cyan(`
-╭──[ 🤖 WELCOME DEAR USER! ]─
-│
-│ If you enjoy using this bot,
-│ please ⭐  Star it & 🍴  Fork it on GitHub!
-│ your support keeps it growing! 💙 
-╰─────────`))
+  console.log(chalk.cyan(`MEGALODON-MD RUNNING 🙂💫`))
 );
 
 setTimeout(() => {
