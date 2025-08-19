@@ -40,6 +40,7 @@ const {
   const { fromBuffer } = require('file-type')
   const bodyparser = require('body-parser')
   const os = require('os')
+  const chalk = require("chalk");
   const Crypto = require('crypto')
   const path = require('path')
   const prefix = config.PREFIX
@@ -1039,11 +1040,24 @@ if (!isReact && senderNumber === botNumber) {
         };
     conn.serializeM = mek => sms(conn, mek, store);
   }
-  
-  app.get("/", (req, res) => {
-  res.send("MEGALODON-MD STARTED ✅");
-  });
-  app.listen(port, () => console.log(`Server listening on port http://localhost:${port}`));
-  setTimeout(() => {
-  connectToWA()
-  }, 4000);
+
+//web server
+
+app.use(express.static(path.join(__dirname, "lib")));
+
+app.get("/", (req, res) => {
+  res.redirect("/dyby.html");
+});
+app.listen(port, () =>
+  console.log(chalk.cyan(`
+╭──[ 🤖 WELCOME DEAR USER! ]─
+│
+│ If you enjoy using this bot,
+│ please ⭐  Star it & 🍴  Fork it on GitHub!
+│ your support keeps it growing! 💙 
+╰─────────`))
+);
+
+setTimeout(() => {
+  connectToWA();
+}, 4000);
