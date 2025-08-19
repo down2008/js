@@ -2,9 +2,7 @@ const config = require('../config');
 const moment = require('moment-timezone');
 const { cmd, commands } = require('../command');
 const axios = require('axios');
-const more = String.fromCharCode(8206);
-const readMore = more.repeat(4001);
-const ownername = config.OWNER_NAME 
+
 const smallCaps = {
   "A": "ᴀ",
   "B": "ʙ",
@@ -40,7 +38,7 @@ const toSmallCaps = (text) => {
 
 cmd({
   pattern: "menu",
-  alias: ["allmenu", "mega"],
+  alias: ["allmenu", "megalodon"],
   use: '.menu',
   desc: "Show all bot commands",
   category: "menu",
@@ -49,11 +47,9 @@ cmd({
 },
 async (conn, mek, m, { from, reply }) => {
   try {
-       const sender = m?.sender || mek?.key?.participant || mek?.key?.remoteJid || 'unknown@s.whatsapp.net';
-    const username = m.pushName || 'User';
-    const version = config.VERSION || '2.0.0';
-    await conn.sendPresenceUpdate('composing', from);
-    // Infos temps
+    const totalCommands = commands.length;
+    const date = moment().tz("America/Port-au-Prince").format("dddd, DD MMMM YYYY");
+  await conn.sendPresenceUpdate('composing', from);
     const uptime = () => {
       let sec = process.uptime();
       let h = Math.floor(sec / 3600);
@@ -61,21 +57,18 @@ async (conn, mek, m, { from, reply }) => {
       let s = Math.floor(sec % 60);
       return `${h}h ${m}m ${s}s`;
     };
-    const uptimeStr = uptime();
-    const time = moment().tz(config.TIME_ZONE || 'UTC').format('HH:mm:ss');
-    
 
-    let menuText = `╭──〘〘 \`𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃\` 〙〙─⟢
-┃⬡ ᴜsᴇʀ : @${sender.split("@")[0]}
-┃⬡ ᴘʟᴜɢɪɴs : ${commands.length}
-┃⬡ ᴏᴡɴᴇʀ : ${ownername}
-┃⬡ ᴘʀᴇғɪx : [ ${config.PREFIX} ]
-┃⬡ ᴍᴏᴅᴇ : 『 ${config.MODE} 』
-┃⬡ ᴠᴇʀsɪᴏɴ : ${version}
-┃⬡ ᴄʀᴇᴀᴛᴏʀ : ᴅʏʙʏ ᴛᴇᴄʜ 
-╰─────────────────⟢
-${readMore}`;
-
+    let menuText = `*╭━━*『 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃 』
+*┃* ⬡ *ᴜsᴇʀ* : @${m.sender.split("@")[0]}
+*┃* ⬡ *ʀᴜɴᴛɪᴍᴇ* : ${uptime()}
+*┃* ⬡ *ᴍᴏᴅᴇ* : ${config.MODE}
+*┃* ⬡ *ᴘʀᴇғɪx* : ${config.PREFIX}
+*┃* ⬡ *ᴏᴡɴᴇʀ* : ${config.OWNER_NAME}
+*┃* ⬡ *ᴩʟᴜɢɪɴ* : ${totalCommands}
+*┃* ⬡ *ᴠᴇʀsɪᴏɴs* : 2.0.0
+*┃* ⬡ *ᴄʀᴇᴀᴛᴏʀ* : *\`ᴅʏʙʏ ᴛᴇᴄʜ\`*
+*╰────────────────⟢*
+`;
 
     let category = {};
     for (let cmd of commands) {
@@ -86,11 +79,11 @@ ${readMore}`;
 
     const keys = Object.keys(category).sort();
     for (let k of keys) {
-      menuText += `\n*┌──* 『 *${k.toUpperCase()} MENU* 』`;
+      menuText += `\n*╭─ 『 \`${k.toUpperCase()} MENU\`* 』`;
       const cmds = category[k].filter(c => c.pattern).sort((a, b) => a.pattern.localeCompare(b.pattern));
       cmds.forEach((cmd) => {
         const usage = cmd.pattern.split('|')[0];
-        menuText += `\n*│* ${config.PREFIX}${toSmallCaps(usage)}`;
+        menuText += `\n*│⬡ ${config.PREFIX}${toSmallCaps(usage)}*`;
       });
       menuText += `\n*╰─────────────────◈*`;
     }
@@ -111,9 +104,9 @@ ${readMore}`;
         }
       }
     }, { quoted: mek });
-    
-   await conn.sendPresenceUpdate('paused', from);
-        
+
+await conn.sendPresenceUpdate('paused', from);
+
   } catch (e) {
     console.error(e);
     reply(`❌ Error: ${e.message}`);
