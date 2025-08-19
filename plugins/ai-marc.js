@@ -1,72 +1,71 @@
 const { cmd } = require('../command');
-const axios = require("axios");
-const franc = require("franc-min");
+const axios = require('axios');
+const franc = require('franc-min');
 
-// ISO639‑3 -> ISO639‑1 (basique)
+// Conversion ISO639-3 → ISO639-1 (basique)
 const langMap = {
-  fra: "fr", eng: "en", spa: "es", deu: "de", ita: "it",
-  por: "pt", rus: "ru", tur: "tr", ara: "ar", jpn: "ja", kor: "ko",
-  hin: "hi", ben: "bn", urd: "ur", tam: "ta", ind: "id", vie: "vi"
+  fra: 'fr', eng: 'en', spa: 'es', deu: 'de', ita: 'it',
+  por: 'pt', rus: 'ru', tur: 'tr', ara: 'ar', jpn: 'ja', kor: 'ko'
 };
 
-// Découper un long texte pour WhatsApp
-function chunk(text, size = 3500) {
-  const out = [];
-  for (let i = 0; i < text.length; i += size) out.push(text.slice(i, i + size));
-  return out;
+// util: coupe un long texte en messages WhatsApp safe
+function splitLong(txt, size = 3000) {
+  if (!txt || txt.length <= size) return [txt];
+  const parts = [];
+  for (let i = 0; i < txt.length; i += size) parts.push(txt.slice(i, i + size));
+  return parts;
 }
 
 cmd({
-  pattern: "marc",
-  desc: "Discute avec ton IA",
-  category: "AI",
-  react: "🤖",
+  pattern: 'marc',
+  desc: 'Discute avec ton IA',
+  category: 'ai',
+  react: '🤖',
   filename: __filename
 }, async (conn, mek, m, { q }) => {
-  if (!q) return m.reply("❌ Donne un texte après `.ai`");
+  if (!q) return m.reply('❌ Donne un texte après `.ai`');
 
-  // 1) Détection langue
-  let iso3 = franc(q) || "und";
-  let lang = langMap[iso3] || (/^[a-zA-Z0-9\s.,?!'"`]/.test(q) ? "en" : "fr"); // fallback
+  // présence "en train d’écrire"
+  await conn.sendPresenceUpdate?.('composing', m.chat).catch(() => {});
+
   try {
-    // 2) Appel API (avec retry simple)
-    const call = async () => axios.post(
-      "https://chat.vezxa.com/v1/chat",
-      { prompt: q },
+    // Détection automatique de la langue
+    const iso639_3 = franc(q) || 'fra';
+    const lang = langMap[iso639_3] || 'fr'; // défaut FR
+
+    // Appel API
+    const res = await axios.post(
+      'https://chat.vezxa.com/v1/chat',
+      { prompt: q, max_tokens: 200 },
       {
         headers: {
-          "Content-Type": "application/json",
-          "Accept-Language": lang
+          'Content-Type': 'application/json',
+          'Accept-Language': lang
         },
-        timeout: 15000
+        timeout: 20000 // 20s
       }
     );
 
-    let res;
-    try {
-      res = await call();
-    } catch (e) {
-      // Retry une fois si timeout / 5xx / network
-      if (e.code === "ECONNABORTED" || (e.response && e.response.status >= 500)) {
-        res = await call();
-      } else {
-        throw e;
-      }
-    }
+    const data = res.data || {};
+    const reply = data.reply || data.message || '❌ Pas de réponse reçue.';
 
-    const reply =
-      (res.data && (res.data.reply || res.data.message)) ||
-      "❌ Pas de réponse reçue.";
-
-    // 3) Envoi en morceaux si nécessaire
-    for (const part of chunk(reply)) {
+    // Envoie en plusieurs messages si c’est long
+    for (const part of splitLong(reply)) {
       await m.reply(part);
     }
+
   } catch (e) {
-    const details = e.response?.data
-      ? `\n\nDétails: ${JSON.stringify(e.response.data).slice(0, 800)}`
-      : "";
-    console.error("Erreur API .ai:", e.message, details);
-    await m.reply("⚠️ Erreur API, réessaye plus tard." + details);
+    // Log détaillé serveur
+    const apiErr = e?.response?.data;
+    console.error('Erreur API .ai =>', apiErr || e.message);
+
+    // Message utilisateur propre
+    let msg = '⚠️ Erreur API, réessaye plus tard.';
+    if (apiErr?.details) msg = '⚠️ ' + apiErr.details;
+    else if (apiErr?.error) msg = '⚠️ ' + apiErr.error;
+
+    await m.reply(msg);
+  } finally {
+    await conn.sendPresenceUpdate?.('paused', m.chat).catch(() => {});
   }
 });
