@@ -18,7 +18,7 @@ const langMap = {
 };
 
 cmd({
-    pattern: "ai",
+    pattern: "marc",
     desc: "Discute avec ton IA",
     category: "AI",
     react: "🤖",
