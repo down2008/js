@@ -29,6 +29,7 @@ const {
   const ff = require('fluent-ffmpeg')
   const P = require('pino')
   const config = require('./config')
+  const { PresenceControl, BotActivityFilter } = require('./data/presence');
   const GroupEvents = require('./lib/groupevents');
   const qrcode = require('qrcode-terminal')
   const StickersTypes = require('wa-sticker-formatter')
@@ -331,8 +332,16 @@ conn.ev.on('messages.upsert', async (msg) => {
   });
 //=========WELCOME & GOODBYE =======
 	
-conn.ev.on("group-participants.update", (update) => GroupEvents(conn, update));	  
-	  
+conn.ev.on('presence.update', async (update) => {
+    await PresenceControl(conn, update);
+});
+
+// always Online 
+
+conn.ev.on("presence.update", (update) => PresenceControl(conn, update));
+
+
+BotActivityFilter(conn);	
 
  /// READ STATUS       
   conn.ev.on('messages.upsert', async(mek) => {
