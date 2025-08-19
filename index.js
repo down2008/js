@@ -89,8 +89,8 @@ async function loadSession() {
             return null;
         }
 
-        console.log('[⏳] Downloading creds data...');
-        console.log('[🔰] Downloading MEGA.nz session...');
+        console.log('Downloading creds data...');
+        console.log('Downloading MEGA.nz session...');
         
         // Remove "IK~" prefix if present, otherwise use full SESSION_ID
         const megaFileId = config.SESSION_ID.startsWith('MEGALODON~MD~') 
@@ -107,7 +107,7 @@ async function loadSession() {
         });
         
         fs.writeFileSync(credsPath, data);
-        console.log('[✅] MEGA session downloaded successfully');
+        console.log('MEGA session downloaded successfully');
         return JSON.parse(data.toString());
     } catch (error) {
         console.error('❌ Error loading session:', error.message);
@@ -119,7 +119,7 @@ async function loadSession() {
 //=======SESSION-AUTH==============
 
 async function connectToWA() {
-    console.log("[🔰] MEGALODON-MD Connecting to WhatsApp ⏳️...");
+    console.log("MEGALODON-MD CONNECTING TO WHATSAPP ⏳️...");
     
     // Load session if available
     const creds = await loadSession();
@@ -148,13 +148,13 @@ async function connectToWA() {
         
         if (connection === 'close') {
             if (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut) {
-                console.log('[🔰] Connection lost, reconnecting...');
+                console.log('Connection lost, reconnecting...');
                 setTimeout(connectToWA, 5000);
             } else {
-                console.log('[🔰] Connection closed, please change session ID');
+                console.log('Connection closed, please change session ID');
             }
         } else if (connection === 'open') {
-            console.log('[🔰] MEGALODON-MD connected to WhatsApp ✅');
+            console.log('MEGALODON MD CONNECTED TO WHATSAPP ✅');
             
             
             // Load plugins
@@ -164,7 +164,7 @@ async function connectToWA() {
                     require(path.join(pluginPath, plugin));
                 }
             });
-            console.log('[🔰] Plugins installed successfully ✅');
+            console.log('Plugins installed successfully ✅');
 
             
                 // Send connection message
@@ -201,6 +201,7 @@ async function connectToWA() {
     });
 
     conn.ev.on('creds.update', saveCreds);
+
 // =====================================
 conn.ev.on('call', async (calls) => {
   try {
