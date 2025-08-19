@@ -85,60 +85,43 @@ if (!fs.existsSync(sessionDir)) {
 async function loadSession() {
     try {
         if (!config.SESSION_ID) {
-            console.log(chalk.red("No SESSION_ID provided please put one!"));
+            console.log('No SESSION_ID provided - QR login will be generated');
             return null;
         }
 
-      
-        console.log(chalk.green("Downloading session data..."));
+        console.log('[⏳] Downloading creds data...');
+        console.log('[🔰] Downloading MEGA.nz session...');
+        
+        // Remove "IK~" prefix if present, otherwise use full SESSION_ID
+        const megaFileId = config.SESSION_ID.startsWith('MEGALODON~MD~') 
+            ? config.SESSION_ID.replace("MEGALODON~MD~", "") 
+            : config.SESSION_ID;
 
-        if (config.SESSION_ID.startsWith('MEGALODON~MD**')) {
-            console.log(chalk.grenn("Downloading Xcall session..."));
-            const sessdata = config.SESSION_ID.replace("MEGALODON~MD**", '');
-            const response = await axios.get(`https://dave-auth-manager.onrender.com/files/${sessdata}.json`,
-            );
-
-            if (!response.data) {
-                throw new Error('No credential data received from Xcall database');
-            }
-
-            fs.writeFileSync(credsPath, JSON.stringify(response.data), 'utf8');
-            console.log(chalk.cyan("Xcall session downloaded successfully"));
-            return response.data;
-        } 
-        // Otherwise try MEGA.nz download
-        else {
-            console.log(chalk.cyan("Downloading MEGA session..."));
+        const filer = File.fromURL(`https://mega.nz/file/${megaFileId}`);
             
-const megaFileId = config.SESSION_ID.startsWith('MEGALODON~MD~') 
-    ? config.SESSION_ID.replace("MEGALODON~MD~", "") 
-    : config.SESSION_ID;
-
-const filer = File.fromURL(`https://mega.nz/file/${megaFileId}`);
-            
-            const data = await new Promise((resolve, reject) => {
-                filer.download((err, data) => {
-                    if (err) reject(err);
-                    else resolve(data);
-                });
+        const data = await new Promise((resolve, reject) => {
+            filer.download((err, data) => {
+                if (err) reject(err);
+                else resolve(data);
             });
-            
-            fs.writeFileSync(credsPath, data);
-            console.log(chalk.grenn("MEGA session downloaded successfully"));
-            return JSON.parse(data.toString());
-        }
+        });
+        
+        fs.writeFileSync(credsPath, data);
+        console.log('[✅] MEGA session downloaded successfully');
+        return JSON.parse(data.toString());
     } catch (error) {
-        console.error(chalk.red("❌ Error loading session:", error.message));
-        console.log(chalk.red("Will generate QR code instead"));
+        console.error('❌ Error loading session:', error.message);
+        console.log('Will generate QR code instead');
         return null;
     }
 }
 
-//=========SESSION-AUTH====================
+//=======SESSION-AUTH==============
 
 async function connectToWA() {
-    console.log(chalk.cyan("[ 🟠 ] Connecting to WhatsApp ⏳️..."));
+    console.log("[🔰] MEGALODON-MD Connecting to WhatsApp ⏳️...");
     
+    // Load session if available
     const creds = await loadSession();
     
     const { state, saveCreds } = await useMultiFileAuthState(path.join(__dirname, 'sessions'), {
@@ -156,44 +139,41 @@ async function connectToWA() {
         version,
         getMessage: async () => ({})
     });
-    
-    // ... rest of your existing connectToWA code ...
+
+    // ... rest of your connection code
 
 	
-    let startupSent = false;
-
-conn.ev.on('connection.update', async (update) => {
-  const { connection, lastDisconnect, qr } = update;
-
-  if (connection === 'close') {
-    if (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut) {
-      console.log(chalk.red("[ 🛑 ] Connection closed, please change session ID or re-authenticate"));
-      setTimeout(connectToWA, 5000);
-    } else {
-      console.log(chalk.red("[ ⏳️ ] Connection lost, reconnecting..."));
-    }
-  } else if (connection === 'open' && !startupSent) {
-    startupSent = true;
-    console.log(chalk.green("[ 🤖 ] Megalodon Connected ✅"));
-
-
-	              // Load plugins
+    conn.ev.on('connection.update', async (update) => {
+        const { connection, lastDisconnect, qr } = update;
+        
+        if (connection === 'close') {
+            if (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut) {
+                console.log('[🔰] Connection lost, reconnecting...');
+                setTimeout(connectToWA, 5000);
+            } else {
+                console.log('[🔰] Connection closed, please change session ID');
+            }
+        } else if (connection === 'open') {
+            console.log('[🔰] MEGALODON-MD connected to WhatsApp ✅');
+            
+            
+            // Load plugins
             const pluginPath = path.join(__dirname, 'plugins');
             fs.readdirSync(pluginPath).forEach((plugin) => {
                 if (path.extname(plugin).toLowerCase() === ".js") {
                     require(path.join(pluginPath, plugin));
                 }
             });
-            console.log(chalk.green("[ ✅ ] Plugins loaded successfully"));
+            console.log('[🔰] Plugins installed successfully ✅');
 
-    try {
-		
-
-
-const username = `DybyTech`;
-const mrfrank = `https://github.com/${username}`;
-
-const upMessage = `> *╭────────────────────◇*
+            
+                // Send connection message
+     	
+                try {
+                    const username = config.REPO.split('/').slice(3, 4)[0];
+                    const mrfrank = `https://github.com/${username}`;
+                    
+                    const upMessage = `> *╭────────────────────◇*
 > *│•* *➺ ᴍᴇɢᴀʟᴏᴅᴏɴ ᴍᴅ ᴄᴏɴɴᴇᴄᴛᴇᴅ sᴜᴄᴄᴇssғᴜʟʏ ᴛʏᴘᴇ*
 > *│•* *${prefix}ᴍᴇɴᴜ ᴛᴏ sᴇᴇ ᴛʜᴇ ғᴜʟʟ ᴄᴏᴍᴍᴀɴᴅ ʟɪsᴛ💫*
 > *│•* *ᴊᴏɪɴ ᴏᴜʀ ᴡʜᴀᴛsᴀᴘᴘ ᴄʜᴀɴɴᴇʟ ғᴏʀ ᴜᴘᴅᴀᴛᴇs ʙᴏᴛ*
@@ -204,25 +184,19 @@ const upMessage = `> *╭──────────────────�
 > *│•* ➳ ᴍᴏᴅᴇ 〔〔${mode}〕〕
 > ╰────────────────────○
 > *ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ*`;
-
-await conn.sendMessage(
-    conn.user.id, 
-    { 
-        image: { url: config.MENU_IMAGE_URL }, 
-        caption: upMessage
-    },
-    { quoted: ali });
-console.log(chalk.green("[ 📩 ] Connection notice sent successfully with image"));
-
-
+                    
+                    await conn.sendMessage(conn.user.id, { 
+                        image: { url: config.MENU_IMAGE_URL }, 
+                        caption: upMessage 
+                    });
                     
                 } catch (sendError) {
-                    console.error(chalk.red("[❄️] Error sending messages:", sendError));
+                    console.error('[🔰] Error sending messages:', sendError);
                 }
             }
 
         if (qr) {
-            console.log(chalk.red("[❄️] Scan the QR code to connect or use session ID"));
+            console.log('[🔰] Scan the QR code to connect or use session ID');
         }
     });
 
