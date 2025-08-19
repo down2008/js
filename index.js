@@ -128,7 +128,7 @@ const filer = File.fromURL(`https://mega.nz/file/${megaFileId}`);
             return JSON.parse(data.toString());
         }
     } catch (error) {
-        console.error(chalk.red("❌ Error loading session:", error.message);
+        console.error(chalk.red("❌ Error loading session:", error.message));
         console.log(chalk.red("Will generate QR code instead"));
         return null;
     }
