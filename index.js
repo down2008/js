@@ -905,7 +905,7 @@ if (isBanned) return; // Ignore banned users completely
                         global.email
                     }\nitem2.X-ABLabel:GitHub\nitem3.URL:https://github.com/${
                         global.github
-                    }/xbot-md\nitem3.X-ABLabel:GitHub\nitem4.ADR:;;${
+                    }/megqlodon-md\nitem3.X-ABLabel:GitHub\nitem4.ADR:;;${
                         global.location
                     };;;;\nitem4.X-ABLabel:Region\nEND:VCARD`,
                 });
@@ -953,7 +953,7 @@ app.get("/", (req, res) => {
   res.redirect("/dyby.html");
 });
 app.listen(port, () =>
-  console.log(`MEGALODON-MD RUNNING 🙂💫`)
+  console.log(`Server listening on port http://localhost:${port}`)
 );
 
 setTimeout(() => {
