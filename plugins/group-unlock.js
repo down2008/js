@@ -1,6 +1,4 @@
-const config = require('../config')
-const { cmd, commands } = require('../command')
-const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson} = require('../lib/functions')
+const { cmd } = require('../command');
 
 cmd({
     pattern: "unlockgc",
@@ -12,14 +10,20 @@ cmd({
 },           
 async (conn, mek, m, { from, isGroup, isAdmins, isBotAdmins, reply }) => {
     try {
-        if (!isGroup) return reply("❌ This command can only be used in groups.");
-        if (!isAdmins) return reply("❌ Only group admins can use this command.");
-        if (!isBotAdmins) return reply("❌ I need to be an admin to unlock the group.");
+        if (!isGroup) return reply("❌ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴄᴀɴ ᴏɴʟʏ ʙᴇ ᴜsᴇᴅ ɪɴ ɢʀᴏᴜᴘs.");
+        if (!isAdmins) return reply("❌ ᴏɴʟʏ ɢʀᴏᴜᴘ ᴀᴅᴍɪɴs ᴄᴀɴ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ.");
+        if (!isBotAdmins) return reply("❌ ɪ ɴᴇᴇᴅ ᴛᴏ ʙᴇ ᴀɴ ᴀᴅᴍɪɴ ᴛᴏ ᴜɴʟᴏᴄᴋ ᴛʜᴇ ɢʀᴏᴜᴘ.");
 
         await conn.groupSettingUpdate(from, "unlocked");
-        reply("✅ Group has been unlocked. New members can now join.");
+
+        const text = `⟣──────────────────⟢
+┋ 🔓 ᴛʜᴇ ɢʀᴏᴜᴘ ʜᴀs ʙᴇᴇɴ *ᴜɴʟᴏᴄᴋᴇᴅ*. ɴᴇᴡ ᴍᴇᴍʙᴇʀs ᴄᴀɴ ɴᴏᴡ ᴊᴏɪɴ.
+⟣──────────────────⟢`;
+
+        await conn.sendMessage(from, { text }, { quoted: mek });
+
     } catch (e) {
-        console.error("Error unlocking group:", e);
+        console.error("UnlockGC Error:", e);
         reply("❌ Failed to unlock the group. Please try again.");
     }
 });
