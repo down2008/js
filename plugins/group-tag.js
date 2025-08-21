@@ -21,9 +21,7 @@ async (conn, mek, m, { from, q, isGroup, isCreator, isAdmins, participants, repl
 
     // Format the message with your style
     const styledText = `⟣──────────────────⟢
-┋ *ᴄʀᴇᴀᴛᴏʀ* : *ᴅʏʙʏ ᴛᴇᴄʜ*
 ┋ *ᴍᴇssᴀɢᴇ* : ${messageText}
-┋ *ᴛᴀɢ* : All Members
 ⟣──────────────────⟢`;
 
     // If it's a quoted media, attach it
