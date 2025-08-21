@@ -1,5 +1,6 @@
 const { cmd } = require('../command');
 const config = require('../config');
+const fs = require("fs");
 
 cmd({
   pattern: "alive2",
@@ -10,35 +11,40 @@ cmd({
 },
 async (conn, mek, m, { from }) => {
   try {
-    // Fake quoted "Meta AI · Status"
+    // Petite image miniature pour le fake quoted (PP Meta AI style)
+    const thumbUrl = "https://files.catbox.moe/w1l8b0.jpg"; // change si tu veux
+    const thumb = await conn.getFile(thumbUrl);
+
+    // ✅ Fake quoted avec image miniature
     const metaAIQuoted = {
       key: {
         remoteJid: "status@broadcast",
         participant: "0@s.whatsapp.net",
         fromMe: false,
-        id: "MetaAI"
+        id: "MetaAIStatus"
       },
       message: {
-        contactMessage: {
-          displayName: "𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃",
-          vcard: "BEGIN:VCARD\nVERSION:3.0\nN:;Lakiya;;;\nFN:🔥LAKIYA MD MINI BOT🔥\nitem1.TEL;waid=2424281102:+242 428 1102\nEND:VCARD",
+        extendedTextMessage: {
+          text: "Contact: 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃",
+          title: "Meta AI · Status",
+          previewType: "NONE",
+          jpegThumbnail: thumb.data // 👉 la miniature comme dans un vrai statut
         }
-      },
-      participant: "0@s.whatsapp.net"
+      }
     };
 
     // Texte Alive
     const aliveText = `✅ ʜᴇʟʟᴏ ${config.ownername || "User"}\n\n🤖 ʙᴏᴛ ɪꜱ ᴏɴʟɪɴᴇ!\n⚡ ɴᴀᴍᴇ: ᴍᴇɢᴀʟᴏᴅᴏɴ-ᴍᴅ\n📡 ᴍᴏᴅᴇ: Public\n⏰ ᴜᴘᴛɪᴍᴇ: Running...`;
 
-    // Photo à afficher (tu peux remplacer par ton URL)
-    const imageUrl = "https://files.catbox.moe/w1l8b0.jpg"; 
+    // Grande image Alive (genre bannière)
+    const imageUrl = "https://files.catbox.moe/w1l8b0.jpg";
 
-    // Envoi avec photo + fake quoted
+    // Envoi avec fake quoted Meta AI
     await conn.sendMessage(
       from,
-      { 
-        image: { url: imageUrl }, 
-        caption: aliveText 
+      {
+        image: { url: imageUrl },
+        caption: aliveText
       },
       { quoted: metaAIQuoted }
     );
