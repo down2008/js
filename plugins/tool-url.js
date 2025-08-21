@@ -63,8 +63,8 @@ cmd({
     // Send response
     await reply(
       `*${mediaType} ᴜᴘʟᴏᴀᴅᴇᴅ sᴜᴄᴄᴇssғᴜʟʟʏ*\n\n` +
-      `*Size:* ${formatBytes(mediaBuffer.length)}\n` +
-      `*URL:* ${mediaUrl}\n\n` +
+      `*sɪᴢᴇ:* ${formatBytes(mediaBuffer.length)}\n` +
+      `*ᴜʀʟ:* ${mediaUrl}\n\n` +
       `> © ᴜᴘʟᴏᴀᴅᴇᴅ ʙʏ ᴅʏʙʏ ᴛᴇᴄʜ `
     );
 
