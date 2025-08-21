@@ -3,37 +3,48 @@ const config = require('../config');
 
 cmd({
   pattern: "alive2",
-  desc: "Check bot status",
-  category: "main",
-  react: "💡",
+  desc: "Show alive status with Meta AI fake quoted and photo",
+  category: "general",
+  react: "🤖",
   filename: __filename
 },
-async (conn, mek, m, { from, reply }) => {
+async (conn, mek, m, { from }) => {
   try {
-    // fake quoted comme sur ton screen
-    const fakeQuoted = {
+    // Fake quoted "Meta AI · Status"
+    const metaAIQuoted = {
       key: {
-        fromMe: false,
+        remoteJid: "status@broadcast",
         participant: "0@s.whatsapp.net",
-        remoteJid: "status@broadcast"
+        fromMe: false,
+        id: "MetaAI"
       },
       message: {
         contactMessage: {
-          displayName: "🔥MEGALODON MD 🔥",
-          vcard: "BEGIN:VCARD\nVERSION:3.0\nN:;Lakiya;;;\nFN:Lakiya\nitem1.TEL;waid=2424281102:+242 428 1102\nEND:VCARD",
-          jpegThumbnail: null
+          displayName: "𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃",
+          vcard: "BEGIN:VCARD\nVERSION:3.0\nN:;Lakiya;;;\nFN:🔥LAKIYA MD MINI BOT🔥\nitem1.TEL;waid=2424281102:+242 428 1102\nEND:VCARD",
         }
-      }
+      },
+      participant: "0@s.whatsapp.net"
     };
 
-    // texte alive
-    const text = `ʜᴇʏ 👋\n\n✅ I'm alive and running perfectly!\n\n⚡ Bot: ᴍᴇɢᴀʟᴏᴅᴏɴ-ᴍᴅ\n👑 Owner: ${config.ownername}\n⏰ Uptime: running...`;
+    // Texte Alive
+    const aliveText = `✅ ʜᴇʟʟᴏ ${config.ownername || "User"}\n\n🤖 ʙᴏᴛ ɪꜱ ᴏɴʟɪɴᴇ!\n⚡ ɴᴀᴍᴇ: ᴍᴇɢᴀʟᴏᴅᴏɴ-ᴍᴅ\n📡 ᴍᴏᴅᴇ: Public\n⏰ ᴜᴘᴛɪᴍᴇ: Running...`;
 
-    // envoi avec fake quoted
-    await conn.sendMessage(from, { text }, { quoted: fakeQuoted });
+    // Photo à afficher (tu peux remplacer par ton URL)
+    const imageUrl = "https://files.catbox.moe/w1l8b0.jpg"; 
+
+    // Envoi avec photo + fake quoted
+    await conn.sendMessage(
+      from,
+      { 
+        image: { url: imageUrl }, 
+        caption: aliveText 
+      },
+      { quoted: metaAIQuoted }
+    );
 
   } catch (e) {
     console.log(e);
-    reply("⚠️ Error in alive command");
+    await conn.sendMessage(from, { text: "⚠️ Error in alive command" });
   }
 });
