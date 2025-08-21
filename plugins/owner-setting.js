@@ -56,28 +56,44 @@ async (conn, mek, m, { from, isOwner, reply, isCreator }) => {
 // delete 
 
 cmd({
-pattern: "delete",
-react: "🗑",
-alias: ["del"],
-desc: "delete message",
-category: "group",
-use: '.del',
-filename: __filename
+  pattern: "delete",
+  react: "🗑",
+  alias: ["del"],
+  desc: "Delete a message intelligently",
+  category: "group",
+  use: '.del',
+  filename: __filename
 },
-async(conn, mek, m,{from, l, quoted, body, isCmd, command, isCreator, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants,  isItzcp, groupAdmins, isBotAdmins, isAdmins, reply}) => {
-if (!isOwner ||  !isAdmins) return;
-try{
-if (!m.quoted) return reply(mg.notextfordel);
-const key = {
-            remoteJid: m.chat,
-            fromMe: false,
-            id: m.quoted.id,
-            participant: m.quoted.sender
-        }
-        await conn.sendMessage(m.chat, { delete: key })
-} catch(e) {
-console.log(e);
-reply('successful..👨‍💻✅')
-} 
-})
+async (conn, mek, m, { reply, isOwner, isAdmins }) => {
+  if (!isOwner && !isAdmins) return reply("❌ You don't have permission to delete messages!");
+  if (!m.quoted) return reply("❌ Please reply to the message you want to delete.");
 
+  try {
+    // If the bot sent the message
+    if (m.quoted.fromMe) {
+      await conn.sendMessage(m.chat, { delete: { remoteJid: m.chat, id: m.quoted.id, fromMe: true } });
+      return reply("✅ Your message was deleted successfully!");
+    }
+
+    // If the bot is admin in a group, can delete anyone's message
+    if (m.chat.endsWith("@g.us")) {
+      if (!isAdmins) return reply("❌ I need admin privileges to delete others' messages!");
+      await conn.sendMessage(m.chat, {
+        delete: {
+          remoteJid: m.chat,
+          id: m.quoted.id,
+          participant: m.quoted.sender,
+          fromMe: false
+        }
+      });
+      return reply("✅ Message deleted successfully!");
+    }
+
+    // Otherwise, cannot delete other people's messages
+    reply("❌ I can't delete this message because I don't have admin rights and it wasn't sent by me.");
+    
+  } catch (e) {
+    console.log(e);
+    reply("❌ Failed to delete the message.");
+  }
+});
