@@ -13,25 +13,27 @@ async (conn, mek, m, {
 }) => {
     if (!isGroup) return reply("❌ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ᴄᴀɴ ᴏɴʟʏ ʙᴇ ᴜsᴇᴅ ɪɴ ɢʀᴏᴜᴘs.");
 
-    // Permission check using isCreator
+    // Permission check
     if (!isCreator) {
         return await conn.sendMessage(from, {
-            text: "*📛 ᴛʜɪs ɪs ᴀɴ ᴏᴡɴᴇʀ ᴄᴏᴍᴍᴀɴᴅ.*"
+            text: "📛 ᴛʜɪs ɪs ᴀɴ *ᴏᴡɴᴇʀ-ᴏɴʟʏ*."
         }, { quoted: mek });
     }
 
-    if (!isBotAdmins) return reply("❌ I need to be an admin to use this command.");
-    if (!q) return reply("❌ Please provide a country code. Example: .out 92");
+    if (!isBotAdmins) return reply("❌ ɪ ɴᴇᴇᴅ ᴛᴏ ʙᴇ ᴀɴ ᴀᴅᴍɪɴ ᴛᴏ ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ.");
+    if (!q) return reply("❌ ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴀ ᴄᴏᴜɴᴛʀʏ ᴄᴏᴅᴇ. ᴇxᴀᴍᴘʟᴇ: .out 92");
 
     const countryCode = q.trim();
     if (!/^\d+$/.test(countryCode)) {
-        return reply("❌ Invalid country code. Please provide only numbers (e.g., 92 for +92 numbers)");
+        return reply("❌ ɪɴᴠᴀʟɪᴅ ᴄᴏᴜɴᴛʀʏ ᴄᴏᴅᴇ. ᴘʟᴇᴀsᴇ ᴘʀᴏᴠɪᴅᴇ ᴏɴʟʏ ᴅɪɢɪᴛs (e.g., 509 ғᴏʀ +509 ɴᴜᴍʙᴇʀs)");
     }
 
     try {
-        const participants = await groupMetadata.participants;
-        const targets = participants.filter(
-            participant => participant.id.startsWith(countryCode) && !participant.admin
+        const participants = groupMetadata.participants;
+
+        // Vérifier la partie avant le @
+        const targets = participants.filter(p =>
+            p.id.split("@")[0].startsWith(countryCode) && !p.admin
         );
 
         if (targets.length === 0) {
@@ -39,9 +41,15 @@ async (conn, mek, m, {
         }
 
         const jids = targets.map(p => p.id);
-        await conn.groupParticipantsUpdate(from, jids, "remove");
 
-        reply(`✅ sᴜᴄᴄᴇssғᴜʟʟʏ ʀᴇᴍᴏᴠᴇᴅ ${targets.length} ᴍᴇᴍʙᴇʀs ᴡɪᴛʜ ᴄᴏᴜɴᴛʀʏ ᴄᴏᴅᴇ +${countryCode}`);
+        // Pour éviter les limites de WhatsApp → suppression en petits lots
+        const chunkSize = 5;
+        for (let i = 0; i < jids.length; i += chunkSize) {
+            const chunk = jids.slice(i, i + chunkSize);
+            await conn.groupParticipantsUpdate(from, chunk, "remove");
+        }
+
+        reply(`✅ sᴜᴄᴄᴇssғᴜʟʟʏ ʀᴇᴍᴏᴠᴇᴅ ${jids.length} ᴍᴇᴍʙᴇʀs ᴡɪᴛʜ ᴄᴏᴜɴᴛʀʏ ᴄᴏᴅᴇ +${countryCode}`);
     } catch (error) {
         console.error("Out command error:", error);
         reply("❌ Failed to remove members. Error: " + error.message);
