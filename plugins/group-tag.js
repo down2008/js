@@ -20,9 +20,8 @@ async (conn, mek, m, { from, q, isGroup, isCreator, isAdmins, participants, repl
     let messageText = q || m.quoted?.text || "> 📨 ᴍᴇssᴀɢᴇ";
 
     // Format the message with your style
-    const styledText = `⟣──────────────────⟢
-┋ *ᴍᴇssᴀɢᴇ* : ${messageText}
-⟣──────────────────⟢`;
+    const styledText = `
+┋ *ᴍᴇssᴀɢᴇ* : ${messageText}`;
 
     // If it's a quoted media, attach it
     if (m.quoted && ['imageMessage', 'videoMessage', 'audioMessage', 'stickerMessage', 'documentMessage'].includes(m.quoted.mtype)) {
