@@ -10,7 +10,6 @@ cmd({
 },
 async (conn, mek, m, { from }) => {
   try {
-    // Fake quoted "Meta AI · Status"
     const metaAIQuoted = {
       key: {
         remoteJid: "status@broadcast",
@@ -21,32 +20,28 @@ async (conn, mek, m, { from }) => {
       message: {
         contactMessage: {
           displayName: "𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃",
-          vcard: "BEGIN:VCARD\nVERSION:3.0\nN:;Lakiya;;;\nFN:𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃\nitem1.TEL;waid=2424281102:+242 428 1102\nEND:VCARD",
+          vcard: "BEGIN:VCARD\r\nVERSION:3.0\r\nN:;Dyby;;;\r\nFN:𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃\r\nitem1.TEL;waid=2424281102:+242 428 1102\r\nEND:VCARD"
         }
       }
     };
 
-    // Texte Alive
-    const aliveText = `✅ ʜᴇʟʟᴏ ${config.config.OWNER_NAME | "User"}\n\n🤖 ʙᴏᴛ ɪꜱ ᴏɴʟɪɴᴇ!\n⚡ ɴᴀᴍᴇ: ᴍᴇɢᴀʟᴏᴅᴏɴ-ᴍᴅ\n📡 ᴍᴏᴅᴇ: Public\n⏰ ᴜᴘᴛɪᴍᴇ: Running...`;
+    const aliveText = `✅ ʜᴇʟʟᴏ ${config.OWNER_NAME | "User"}\n\n🤖 ʙᴏᴛ ɪꜱ ᴏɴʟɪɴᴇ!\n⚡ ɴᴀᴍᴇ: ᴍᴇɢᴀʟᴏᴅᴏɴ-ᴍᴅ\n📡 ᴍᴏᴅᴇ: Public\n⏰ ᴜᴘᴛɪᴍᴇ: Running...`;
 
-    // Photo Alive
-    const imageUrl = "https://files.catbox.moe/w1l8b0.jpg"; 
+    const imageUrl = "https://files.catbox.moe/w1l8b0.jpg";
 
-    // Boutons (compatibles baileys-mod)
     const buttons = [
       { buttonId: ".menu", buttonText: { displayText: "📜 MENU" }, type: 1 },
       { buttonId: ".ping", buttonText: { displayText: "⚡ PING" }, type: 1 }
     ];
 
-    // Envoi avec photo + bouton + fake quoted
     await conn.sendMessage(
       from,
       {
         image: { url: imageUrl },
         caption: aliveText,
         footer: "ᴍᴇɢᴀʟᴏᴅᴏɴ-ᴍᴅ",
-        buttons,
-        headerType: 4
+        buttons: buttons,
+        headerType: 1 // changed to 1 for image with buttons
       },
       { quoted: metaAIQuoted }
     );
