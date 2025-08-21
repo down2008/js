@@ -20,17 +20,17 @@ async (conn, mek, m, { from }) => {
       },
       message: {
         contactMessage: {
-          displayName: "🔥LAKIYA MD MINI BOT🔥",
-          vcard: "BEGIN:VCARD\nVERSION:3.0\nN:;Lakiya;;;\nFN:🔥LAKIYA MD MINI BOT🔥\nitem1.TEL;waid=2424281102:+242 428 1102\nEND:VCARD",
+          displayName: "𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃",
+          vcard: "BEGIN:VCARD\nVERSION:3.0\nN:;Lakiya;;;\nFN:𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃\nitem1.TEL;waid=2424281102:+242 428 1102\nEND:VCARD",
         }
       }
     };
 
     // Texte Alive
-    const aliveText = `✅ ʜᴇʟʟᴏ ${config.ownername || "User"}\n\n🤖 ʙᴏᴛ ɪꜱ ᴏɴʟɪɴᴇ!\n⚡ ɴᴀᴍᴇ: ᴍᴇɢᴀʟᴏᴅᴏɴ-ᴍᴅ\n📡 ᴍᴏᴅᴇ: Public\n⏰ ᴜᴘᴛɪᴍᴇ: Running...`;
+    const aliveText = `✅ ʜᴇʟʟᴏ ${config.config.OWNER_NAME | "User"}\n\n🤖 ʙᴏᴛ ɪꜱ ᴏɴʟɪɴᴇ!\n⚡ ɴᴀᴍᴇ: ᴍᴇɢᴀʟᴏᴅᴏɴ-ᴍᴅ\n📡 ᴍᴏᴅᴇ: Public\n⏰ ᴜᴘᴛɪᴍᴇ: Running...`;
 
     // Photo Alive
-    const imageUrl = "https://telegra.ph/file/6b6a8b9b74b4e3c62c345.jpg"; 
+    const imageUrl = "https://files.catbox.moe/w1l8b0.jpg"; 
 
     // Boutons (compatibles baileys-mod)
     const buttons = [
