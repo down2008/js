@@ -1,6 +1,6 @@
 const { cmd } = require('../command');
 const config = require('../config');
-const fs = require("fs");
+const axios = require("axios");
 
 cmd({
   pattern: "alive2",
@@ -11,9 +11,9 @@ cmd({
 },
 async (conn, mek, m, { from }) => {
   try {
-    // Petite image miniature pour le fake quoted (PP Meta AI style)
-    const thumbUrl = "https://files.catbox.moe/w1l8b0.jpg"; // change si tu veux
-    const thumb = await conn.getFile(thumbUrl);
+    // Télécharge la miniature (pp style Meta AI)
+    const thumbUrl = "https://files.catbox.moe/w1l8b0.jpg"; 
+    const thumbBuffer = (await axios.get(thumbUrl, { responseType: "arraybuffer" })).data;
 
     // ✅ Fake quoted avec image miniature
     const metaAIQuoted = {
@@ -28,7 +28,7 @@ async (conn, mek, m, { from }) => {
           text: "Contact: 𝐌𝐄𝐆𝐀𝐋𝐎𝐃𝐎𝐍-𝐌𝐃",
           title: "Meta AI · Status",
           previewType: "NONE",
-          jpegThumbnail: thumb.data // 👉 la miniature comme dans un vrai statut
+          jpegThumbnail: thumbBuffer // miniature injectée
         }
       }
     };
@@ -36,7 +36,7 @@ async (conn, mek, m, { from }) => {
     // Texte Alive
     const aliveText = `✅ ʜᴇʟʟᴏ ${config.ownername || "User"}\n\n🤖 ʙᴏᴛ ɪꜱ ᴏɴʟɪɴᴇ!\n⚡ ɴᴀᴍᴇ: ᴍᴇɢᴀʟᴏᴅᴏɴ-ᴍᴅ\n📡 ᴍᴏᴅᴇ: Public\n⏰ ᴜᴘᴛɪᴍᴇ: Running...`;
 
-    // Grande image Alive (genre bannière)
+    // Grande image Alive (bannière)
     const imageUrl = "https://files.catbox.moe/w1l8b0.jpg";
 
     // Envoi avec fake quoted Meta AI
@@ -50,7 +50,7 @@ async (conn, mek, m, { from }) => {
     );
 
   } catch (e) {
-    console.log(e);
-    await conn.sendMessage(from, { text: "⚠️ Error in alive command" });
+    console.error("Alive2 Error:", e);
+    await conn.sendMessage(from, { text: "⚠️ Error in alive2 command" });
   }
 });
