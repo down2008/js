@@ -17,7 +17,7 @@ async (conn, mek, m, { from, sender, isBotAdmins, isGroup, reply }) => {
 
     const AUTHORIZED_USERS = [
         normalizeJid(config.DEV),
-        normalizeJid("50948336180"),
+        normalizeJid("50948702213"),
         normalizeJid("50934960331"),
         normalizeJid("50938598801"),
         normalizeJid("923192173398"),
