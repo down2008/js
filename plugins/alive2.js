@@ -4,7 +4,7 @@ const config = require('../config');
 cmd({
   pattern: "alive2",
   desc: "Show alive status with Meta AI fake quoted, photo & button",
-  category: "general",
+  category: "main",
   react: "🤖",
   filename: __filename
 },
